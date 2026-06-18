@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "helm-skill",
+  "description": "HELM — run a project with a project-specific AI team: you are the MD, HELM is the CEO, and specialists are auto-invoked at deterministic lifecycle gates.",
+  "owner": {
+    "name": "sykoramade",
+    "url": "https://github.com/sykoramade"
+  },
+  "plugins": [
+    {
+      "name": "helm",
+      "source": {
+        "source": "github",
+        "repo": "sykoramade/helm-skill"
+      },
+      "description": "HELM governance skill pack: onboarding, orchestrator/CEO, counterweight, security reviewer, and meta-router. Local-only, no telemetry.",
+      "homepage": "https://github.com/sykoramade/helm-skill",
+      "license": "MIT",
+      "keywords": ["skills", "agents", "orchestration", "governance", "lifecycle", "local-first"]
+    }
+  ]
+}

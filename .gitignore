@@ -1,0 +1,19 @@
+# HELM runtime output (written into a consuming project, never into the pack)
+.helm/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor cruft
+*.swp
+*~
+.idea/
+.vscode/

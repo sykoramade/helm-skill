@@ -1,0 +1,12 @@
+{
+  "name": "helm",
+  "version": "1.0.0",
+  "description": "HELM — run a project with a project-specific AI team: you are the MD, HELM is the CEO, and specialists are auto-invoked at deterministic lifecycle gates. Local-only, no telemetry.",
+  "author": {
+    "name": "sykoramade"
+  },
+  "homepage": "https://github.com/sykoramade/helm-skill",
+  "repository": "https://github.com/sykoramade/helm-skill",
+  "license": "MIT",
+  "skills": "./skills"
+}
