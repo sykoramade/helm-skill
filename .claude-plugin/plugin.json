@@ -6,7 +6,7 @@
     "name": "sykoramade"
   },
   "homepage": "https://github.com/sykoramade/helm-skill",
-  "repository": "https://github.com/sykoramade/helm-skill",
+  "repository": "https://github.com/sykoramade/helm-skill.git",
   "license": "MIT",
   "skills": "./skills"
 }

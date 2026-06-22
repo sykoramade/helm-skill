@@ -10,8 +10,8 @@
     {
       "name": "helm",
       "source": {
-        "source": "github",
-        "repo": "sykoramade/helm-skill"
+        "source": "git",
+        "url": "https://github.com/sykoramade/helm-skill.git"
       },
       "description": "HELM governance skill pack: onboarding, orchestrator/CEO, counterweight, security reviewer, and meta-router. Local-only, no telemetry.",
       "homepage": "https://github.com/sykoramade/helm-skill",

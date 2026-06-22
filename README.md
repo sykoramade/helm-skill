@@ -37,6 +37,19 @@ explicit URL it's the same source:
 > **HTTPS** URL above unless you have SSH keys set up for GitHub — an
 > `git@github.com:…` clone will fail without them.
 
+### Troubleshooting
+
+**`Permission denied (publickey)` or `Host key verification failed` on install.**
+A fresh install with the manifest above clones over HTTPS and should never hit
+this. If an **older install** (cached from before this fix) still tries to clone
+over SSH, force git to rewrite SSH GitHub URLs to HTTPS, then retry:
+
+```bash
+git config --global url."https://github.com/".insteadOf "git@github.com:"
+```
+
+This needs no auth for a public repo and works on a machine with no SSH keys.
+
 ### Claude Code — dev path (local, no marketplace)
 
 Point Claude Code straight at a local checkout while you iterate:
