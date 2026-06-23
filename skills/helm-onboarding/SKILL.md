@@ -25,6 +25,9 @@ anything to disk until the MD approves the plan.
 - **Deterministic team selection.** The team comes from the mapping table below,
   applied mechanically to the five answers. You do not "decide who feels
   useful." You apply the table.
+- **Concise and non-technical.** Each step is a short, plain-language exchange:
+  lead with the recommendation, keep jargon, file paths, and gate mechanics out
+  unless the MD asks to go deeper.
 
 ## The flow
 
@@ -101,30 +104,33 @@ Now apply this mapping **mechanically**. Each matching condition adds a role.
 
 ### Answer → role mapping (deterministic)
 
-| Condition (read straight from the answers) | Role added | Status in v1 |
+| Condition (read straight from the answers) | Role added | Status |
 |---|---|---|
-| Q2 = yes (network / file transfer) **OR** Q1 = security | **Security Reviewer** | **built** |
-| Q3 = web | **UX Reviewer** | stub (v1.1) |
-| Q4 = yes **OR** Q1 = correctness | **QA / Test** | stub (v1.1) |
-| Q5 = yes | **Architect** | stub (v1.1) |
-| *always, regardless of answers* | **Orchestrator (CEO)**, **Counterweight**, **Product Keeper** | Orchestrator + Counterweight built; Product Keeper stub (v1.1) |
+| Q2 = yes (network / file transfer) **OR** Q1 = security | **Security Reviewer** | built |
+| Q3 = web | **UX Reviewer** | built |
+| Q4 = yes **OR** Q1 = correctness | **QA / Test** | built |
+| Q5 = yes | **Architect** | built |
+| *always, regardless of answers* | **Orchestrator (CEO)**, **Counterweight**, **Product Keeper**, **Engineer** | built |
 
-**Stub roles are still assigned to the team and named in the manifest.** They
-carry a project-specific WHY just like built roles. The stub note simply records
-that the role's full persona file ships in v1.1; the Orchestrator already
-enforces founding-bet discipline in the interim, and the gate table below shows
-exactly when each stub will begin auto-invoking.
+**Every role is built and auto-invoking.** Each assigned role carries a
+project-specific WHY and fires at its gate (see the Orchestrator gate table):
+Counterweight at Spec and Verify; Architect → Product Keeper → Security Reviewer
+at Plan; QA/Test → Security Reviewer at Build; Product Keeper → UX Reviewer at
+Review. The **Engineer** is the standing implementer the CEO routes to during the
+Build phase — always on the team, never a gate reviewer.
 
 ### Fallback (never force generics)
 
 If the answers do **not** map to any specialist (all of: Q1 = none obvious / not
-security / not correctness, Q2 = no, Q3 = none, Q4 = no, Q5 = no), assemble only:
+security / not correctness, Q2 = no, Q3 = none, Q4 = no, Q5 = no), assemble only
+the always-on core:
 
-> Orchestrator + Counterweight + Product Keeper
+> Orchestrator + Counterweight + Product Keeper + Engineer
 
-…and tell the MD: *"Additional roles are available in the library — add them as
-needs emerge."* Do **not** pad the team with specialists the project does not
-need.
+…and tell the MD: *"Additional reviewers are available in the library — add them
+as needs emerge."* Do **not** pad the team with reviewers the project does not
+need. (The Engineer stays because every project that builds something needs an
+implementer; the reviewers are what's conditional.)
 
 ### WHY-line rule (this is load-bearing)
 
@@ -201,13 +207,14 @@ Q5. yes        (a local peer-to-peer transfer protocol)
 |---|---|---|
 | Orchestrator (CEO) | Always — coordinates the team and enforces the gates | built |
 | Counterweight | Always — argues against the project's dominant assumption | built |
-| Product Keeper | Always — guards the founding bet | stub (v1.1) |
+| Product Keeper | Always — guards the founding bet | built |
+| Engineer | Always — the implementer the CEO routes the build and the fixes to | built |
 | **Security Reviewer** | **Q2 = yes and Q1 = security: files move over an untrusted network, so transfers must be encrypted, authenticated, and integrity-checked** | **built** |
-| UX Reviewer | Q3 = web: a browser drag-and-drop flow a stranger must understand unaided | stub (v1.1) |
-| QA / Test | Q4 = yes: a corrupted or misdelivered file is real harm; transfers need verification | stub (v1.1) |
-| Architect | Q5 = yes: a peer-to-peer transfer protocol needs deliberate design | stub (v1.1) |
+| UX Reviewer | Q3 = web: a browser drag-and-drop flow a stranger must understand unaided | built |
+| QA / Test | Q4 = yes: a corrupted or misdelivered file is real harm; transfers need verification | built |
+| Architect | Q5 = yes: a peer-to-peer transfer protocol needs deliberate design | built |
 
-This **must not** collapse to a generic Orchestrator+Counterweight+Product
-Keeper trio. Security Reviewer is on the team with a project-specific WHY, and
-(per the Orchestrator gate table) it auto-fires at the Plan and Build gates.
-That is the contract this skill exists to satisfy.
+This **must not** collapse to a generic always-on core. Security Reviewer is on
+the team with a project-specific WHY, and (per the Orchestrator gate table) it
+auto-fires at the Plan and Build gates. That is the contract this skill exists to
+satisfy.

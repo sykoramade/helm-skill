@@ -35,18 +35,19 @@ Check in order; the **last** condition that is satisfied is the completed phase:
 
 ### Phase → specialist
 
-| Completed phase | Route to | v1 status |
+| Completed phase | Route to | status |
 |---|---|---|
 | Spec | **Counterweight** | LIVE |
-| Plan | Product Keeper (*v1.1*) + **Security Reviewer** *(if assigned)* | mixed |
-| Build | QA/Test (*v1.1*) + **Security Reviewer** *(if assigned)* | mixed |
+| Plan | **Architect** *(if assigned)* → **Product Keeper** → **Security Reviewer** *(if assigned)* | LIVE |
+| Build | **QA/Test** *(if assigned)* → **Security Reviewer** *(if assigned)* | LIVE |
 | Verify | **Counterweight** | LIVE |
-| Review | Product Keeper (*v1.1*) | v1.1 |
+| Review | **Product Keeper** → **UX Reviewer** *(if assigned)* | LIVE |
 | Ship | (none — CEO logs the final decision) | LIVE |
 
-**Rules:** skip any role not listed in `.helm/team.md`; for a `*v1.1*` role,
-report that the gate would fire and that the role activates in v1.1 — do not
-silently drop it.
+**Rules:** skip any role not listed in `.helm/team.md`; invoke a multi-role gate
+in the listed order. The **Engineer** is not a phase-completion route — it is the
+implementer the CEO routes to *during* Build and for every fix a finding
+generates (see Mode B).
 
 ## Mode B — route by ad-hoc request
 
@@ -56,16 +57,16 @@ When the MD makes a request that isn't a phase transition, map intent → role:
 |---|---|
 | Challenging an assumption, a "are we sure about this?", an overconfident claim, anything stated at confidence ≥9 | **Counterweight** |
 | Networks, file transfer, encryption, auth, secrets, untrusted input, "is this safe?" | **Security Reviewer** *(if assigned; otherwise flag to MD that the role is available)* |
-| Building/implementing a feature | Engineer *(v1.1 stub)* |
-| Test coverage, correctness, regressions | QA/Test *(v1.1 stub)* |
-| Layout, copy, first-time-user clarity, web UX | UX Reviewer *(v1.1 stub)* |
-| System design, protocols, multi-service structure | Architect *(v1.1 stub)* |
-| "Does this still serve the bet?", scope creep | Product Keeper *(v1.1 stub)* |
+| Building/implementing a feature, or applying a reviewer's fix | **Engineer** |
+| Test coverage, correctness, regressions, the unhappy path | **QA / Test** *(if assigned)* |
+| Layout, copy, first-time-user clarity, web UX | **UX Reviewer** *(if assigned)* |
+| System design, protocols, multi-service structure, failure modes | **Architect** *(if assigned)* |
+| "Does this still serve the bet?", scope creep | **Product Keeper** |
 | Coordination, what's next, phase decisions, logging | **Orchestrator (CEO)** — handles directly |
 
-For any v1.1 stub, return the role name and note it activates in v1.1; the
-Orchestrator decides how to proceed in the interim (usually: handle the
-bet/coordination part itself, defer the rest).
+If a routed role is not on `.helm/team.md`, return the role name and flag to the
+MD (via the CEO) that the role is available to add — do not silently drop the
+request. Engineer and Product Keeper are on every team.
 
 ## What you never do
 

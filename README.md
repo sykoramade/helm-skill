@@ -111,9 +111,7 @@ specialist when each gate's mechanical signal is met.
   never bypasses the team. It is your **only** point of contact.
 - **Specialists** do the work and report findings back through the CEO.
 
-## What's in it — built wedge vs. v1.1 stubs
-
-**Built (live in v1):**
+## What's in it — the full team (all built in v1.1)
 
 ```
 skills/
@@ -121,30 +119,40 @@ skills/
                           project-specific team + a real founding bet.
   helm-orchestrator/      The CEO. Coordinates the lifecycle and AUTONOMOUSLY
                           invokes specialists at mechanical phase gates.
-  helm-counterweight/     Standing adversary. Argues against the dominant
-                          assumption; challenges overconfidence (the
-                          high-confidence check).
-  helm-security-reviewer/ Audits networks / transfers / inputs / secrets.
   helm-router/            Meta-router: maps a phase or request -> the right role.
+
+  helm-counterweight/     Standing adversary. Argues against the dominant
+                          assumption; challenges overconfidence (≥9 check).
+                          Fires at Spec and Verify.
+  helm-product-keeper/    Guards the founding bet; cuts scope drift.
+                          Fires at Plan and Review.
+  helm-engineer/          The implementer. Builds the routed task and applies
+                          every reviewer's fix. Routed during Build.
+  helm-architect/         System design — boundaries, protocols, failure modes.
+                          Fires at Plan (if assigned).
+  helm-qa-test/           Correctness: walks the unhappy path; green != verified.
+                          Fires at Build (if assigned).
+  helm-security-reviewer/ Audits networks / transfers / inputs / secrets.
+                          Fires at Plan and Build (if assigned).
+  helm-ux-reviewer/       The first-time-user advocate; clarity for a stranger.
+                          Fires at Review (if assigned).
 ```
 
-**Stubs (assigned today, personas land in v1.1):**
-
-```
-roles/                    Engineer, QA/Test, UX Reviewer, Architect,
-                          Product Keeper — selected by the onboarding table now,
-                          fleshed out as built skills in v1.1.
-```
+Every specialist carries its own **standard and cross-team tension** (e.g. QA's
+"green build ≠ verified" pushes back on the Engineer's "it's done"), and the CEO
+distills their findings into brief, non-technical updates for the MD — depth only
+when you ask.
 
 ## Scope (honest)
 
-**v1 assembles SOFTWARE-engineering teams.** Games, data, and hardware are **v1.1+
-role libraries** — not built yet. v1 is the wedge: onboarding, the
-Orchestrator/CEO, the Counterweight, the Security Reviewer, and the meta-router.
+**v1.1 assembles SOFTWARE-engineering teams with the full specialist roster.**
+A domain-agnostic core + packs (research/writing, business/product) so a project
+can be a paper or a plan — and **portfolio/multi-project orchestration** (one CEO
+across nested projects) are the **next V1.1 phases**, in progress.
 
 **Out of scope (v2, after adoption):** any learning corpus / lesson collection,
 telemetry or central data collection, scoring/ranking systems, and a dashboard.
-v1 is deliberately local-only — nothing to opt out of, nothing to trust us with.
+HELM is deliberately local-only — nothing to opt out of, nothing to trust us with.
 
 ## Prove it works
 

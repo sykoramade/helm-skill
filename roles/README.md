@@ -1,38 +1,34 @@
-# roles/ — v1.1 role library (stubs)
+# roles/ — role library
 
-These are the roles HELM can assign that are **not yet built**. They are real
-parts of the deterministic selection table and the gate table — they get
-assigned to teams and named in the manifest today — but their full personas land
-in **v1.1**.
+As of **v1.1**, the original software role stubs (Engineer, QA/Test, UX Reviewer,
+Architect, Product Keeper) are **all built** and live under `skills/` as
+auto-invoked specialists. The deterministic selection table in
+`skills/helm-onboarding/SKILL.md` assigns them; the gate table in
+`skills/helm-orchestrator/SKILL.md` fires them.
 
-Until a role is built:
+| Role | Built skill | Assigned when | Fires at |
+|---|---|---|---|
+| Orchestrator (CEO) | `helm-orchestrator` | always | coordinates every gate |
+| Counterweight | `helm-counterweight` | always | Spec, Verify, and the ≥9 check |
+| Product Keeper | `helm-product-keeper` | always | Plan, Review |
+| Engineer | `helm-engineer` | always | routed during Build (implementer, not a gate reviewer) |
+| Security Reviewer | `helm-security-reviewer` | `Q2 = yes` OR `Q1 = security` | Plan, Build |
+| QA / Test | `helm-qa-test` | `Q4 = yes` OR `Q1 = correctness` | Build |
+| UX Reviewer | `helm-ux-reviewer` | `Q3 = web` | Review |
+| Architect | `helm-architect` | `Q5 = yes` | Plan |
 
-- Onboarding still assigns it (with a project-specific WHY) when the answers map
-  to it, and records it in `.helm/team.md` with status `stub (v1.1)`.
-- The Orchestrator's gate table still lists its row. In the wedge, that row is
-  **inert**: the Orchestrator logs that the gate *would* fire and notes the role
-  activates in v1.1, rather than silently skipping it.
-- The Orchestrator covers the load-bearing part in the interim where it can
-  (e.g. it enforces founding-bet discipline itself while Product Keeper is a
-  stub).
+## What lives here next
 
-Each stub below follows the **role persona anatomy** that every built role uses,
-with the content left to v1.1:
+This directory is reserved for the **domain-pack role libraries** (a later V1.1+
+phase): a domain-neutral founding core plus selectable packs — `software/`,
+`research-writing/`, `business-product/` — so HELM can assemble teams for a
+research paper or a business plan, not just software. The software roles above
+are the first, reference pack.
 
-```
-name · perspective · the standard it holds · evidence required to exit ·
-anti-rationalization table
-```
-
-To promote a stub to a built role: move it to `skills/helm-<role>/SKILL.md`, add
-frontmatter (`name`, `description`), fill in every anatomy section (use
-`skills/helm-security-reviewer/SKILL.md` as the reference), and flip its gate-row
-status from `v1.1` to `LIVE` in `helm-orchestrator` and `helm-router`.
-
-| Stub | Assigned when | Gate row it will activate |
-|---|---|---|
-| `engineer.md` | (implementation work — always needed once building starts) | Build (does the work routed by the CEO) |
-| `qa-test.md` | `Q4 = yes` OR `Q1 = correctness` | Build → QA/Test |
-| `ux-reviewer.md` | `Q3 = web` | (review of user-facing flows) |
-| `architect.md` | `Q5 = yes` | (design review before build) |
-| `product-keeper.md` | always | Plan → Product Keeper; Review → Product Keeper |
+To build a new role: create `skills/helm-<role>/SKILL.md` with frontmatter
+(`name`, `description`), fill every anatomy section using
+`skills/helm-security-reviewer/SKILL.md` as the reference (perspective · the
+standard it holds · when it fires · method/checklist · cross-team tensions ·
+evidence required to exit · anti-rationalization table), wire its row into
+`helm-orchestrator` and `helm-router`, and keep `smoke-test/run_smoke_test.py` in
+lockstep.

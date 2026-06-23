@@ -46,7 +46,8 @@ def assemble_team(a: Answers) -> list[Role]:
     team: list[Role] = [
         Role("Orchestrator (CEO)", "Always - coordinates the team and enforces the lifecycle gates.", "built"),
         Role("Counterweight", "Always - argues against the project's dominant assumption.", "built"),
-        Role("Product Keeper", "Always - guards the founding bet (Orchestrator covers this until v1.1).", "stub (v1.1)"),
+        Role("Product Keeper", "Always - guards the founding bet.", "built"),
+        Role("Engineer", "Always - the implementer the CEO routes the build and the fixes to.", "built"),
     ]
 
     if a.q2_external or a.q1_risk == "security":
@@ -62,39 +63,58 @@ def assemble_team(a: Answers) -> list[Role]:
     if a.q3_interface == "web":
         team.append(Role("UX Reviewer",
                          "Assigned because the interface is web (Q3=web): a stranger must understand the flow unaided.",
-                         "stub (v1.1)"))
+                         "built"))
 
     if a.q4_correctness or a.q1_risk == "correctness":
         why = ("Assigned because " +
                ("a mistake causes real harm (Q4=yes)" if a.q4_correctness else "correctness is the primary risk (Q1=correctness)") +
                "; behaviour needs verification beyond the happy path.")
-        team.append(Role("QA / Test", why, "stub (v1.1)"))
+        team.append(Role("QA / Test", why, "built"))
 
     if a.q5_design:
         team.append(Role("Architect",
                          "Assigned because the project needs custom protocol / multi-service / pipeline design (Q5=yes).",
-                         "stub (v1.1)"))
+                         "built"))
 
     return team
 
 
+# Always-on core: present on every team regardless of the answers.
+ALWAYS_ON = {"Orchestrator (CEO)", "Counterweight", "Product Keeper", "Engineer"}
+
+
 def is_fallback(team: list[Role]) -> bool:
-    """Fallback trio = only the three always-on roles, no specialist mapped."""
-    return {r.name for r in team} == {"Orchestrator (CEO)", "Counterweight", "Product Keeper"}
+    """Fallback = only the always-on core, no conditional reviewer mapped."""
+    return {r.name for r in team} == ALWAYS_ON
 
 
 # --- the gate table: which assigned specialist auto-fires at each phase -------
-# Mirror of skills/helm-orchestrator/SKILL.md. Only LIVE wedge rows are exercised
-# here. A row is included only if the specialist is on the team.
+# Mirror of skills/helm-orchestrator/SKILL.md. Every roster role is LIVE. A role
+# is included at a gate only if it is on the team; order mirrors the gate table.
 def auto_invocations(team: list[Role]) -> dict[str, list[str]]:
     names = {r.name for r in team}
     gates: dict[str, list[str]] = {
-        "Spec":   ["Counterweight"],                       # LIVE
-        "Verify": ["Counterweight"],                       # LIVE
+        "Spec":   ["Counterweight"],
+        "Verify": ["Counterweight"],
     }
+    # Plan: Architect -> Product Keeper -> Security Reviewer
+    if "Architect" in names:
+        gates.setdefault("Plan", []).append("Architect")
+    if "Product Keeper" in names:
+        gates.setdefault("Plan", []).append("Product Keeper")
     if "Security Reviewer" in names:
-        gates.setdefault("Plan", []).append("Security Reviewer")   # LIVE
-        gates.setdefault("Build", []).append("Security Reviewer")  # LIVE
+        gates.setdefault("Plan", []).append("Security Reviewer")
+    # Build: QA/Test -> Security Reviewer
+    if "QA / Test" in names:
+        gates.setdefault("Build", []).append("QA / Test")
+    if "Security Reviewer" in names:
+        gates.setdefault("Build", []).append("Security Reviewer")
+    # Review: Product Keeper -> UX Reviewer
+    if "Product Keeper" in names:
+        gates.setdefault("Review", []).append("Product Keeper")
+    if "UX Reviewer" in names:
+        gates.setdefault("Review", []).append("UX Reviewer")
+    # Engineer is the implementer routed DURING Build, not a gate-completion row.
     return gates
 
 
@@ -147,6 +167,32 @@ def main() -> int:
     if "Security Reviewer" not in gates.get("Build", []):
         failures.append("CEO does not auto-invoke Security Reviewer at the Build gate.")
 
+    # v1.1: every roster role is built — no stubs may remain.
+    stubs = [r.name for r in team if r.status != "built"]
+    if stubs:
+        failures.append(f"These roles are still stubs, must be built in v1.1: {', '.join(stubs)}.")
+
+    # v1.1: the newly-built roles must auto-fire at their gates for this team
+    # (the file-transfer case assigns all of them).
+    expected_gate_firings = [
+        ("Spec", "Counterweight"),
+        ("Plan", "Architect"),
+        ("Plan", "Product Keeper"),
+        ("Build", "QA / Test"),
+        ("Verify", "Counterweight"),
+        ("Review", "Product Keeper"),
+        ("Review", "UX Reviewer"),
+    ]
+    for phase, role in expected_gate_firings:
+        if role in names and role not in gates.get(phase, []):
+            failures.append(f"CEO does not auto-invoke {role} at the {phase} gate.")
+
+    # Engineer is always on the team (the implementer), never a gate reviewer.
+    if "Engineer" not in names:
+        failures.append("Engineer (the standing implementer) is not on the team.")
+    if any("Engineer" in v for v in gates.values()):
+        failures.append("Engineer must NOT be a gate-completion reviewer — it is routed during Build.")
+
     if failures:
         print("RESULT: FAIL")
         for f in failures:
@@ -156,8 +202,11 @@ def main() -> int:
     print("RESULT: PASS")
     print("  ok  Security Reviewer is on the team")
     print("  ok  its WHY-line is project-specific (references the answers)")
-    print("  ok  not the generic fallback trio")
+    print("  ok  not the generic always-on core")
     print("  ok  CEO auto-invokes Security Reviewer at the Plan and Build gates")
+    print("  ok  all roster roles are built (no stubs remain)")
+    print("  ok  Architect/Product Keeper/QA/UX auto-fire at their gates")
+    print("  ok  Engineer is the standing implementer, not a gate reviewer")
     return 0
 
 

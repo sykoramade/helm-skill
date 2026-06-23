@@ -1,8 +1,8 @@
 # Contributing to HELM
 
-Thanks for helping extend HELM. This pack ships a **built wedge** (five live
-skills) and a set of **v1.1 role stubs** in `roles/`. The most common
-contribution is promoting a stub to a built role.
+Thanks for helping extend HELM. As of **v1.1** the pack ships the **full
+software team as ten live skills**. The most common contribution is adding a new
+built role (e.g. for a future domain pack) or sharpening an existing one.
 
 ## The one rule
 
@@ -18,29 +18,31 @@ If your change touches team selection (`skills/helm-onboarding/SKILL.md`) or the
 autonomous gate table (`skills/helm-orchestrator/SKILL.md`), the smoke test
 mirrors those tables and must be kept in lockstep.
 
-## Promoting a v1.1 stub to a built role
+## Adding a new built role
 
-The stubs live as plain markdown in `roles/` (Engineer, QA/Test, UX Reviewer,
-Architect, Product Keeper). To make one a live, auto-invoked skill:
+To add a live, auto-invoked specialist:
 
-1. **Move it into `skills/`** as its own skill directory:
-   `roles/<role>.md` → `skills/helm-<role>/SKILL.md`.
-2. **Add frontmatter** at the top of `SKILL.md`:
+1. **Create the skill directory** `skills/helm-<role>/SKILL.md`.
+2. **Add frontmatter** at the top:
    ```yaml
    ---
    name: helm-<role>
    description: <one line — what this role does and when the Orchestrator invokes it>
    ---
    ```
-3. **Fill the anatomy sections** to match the built skills (e.g.
-   `helm-security-reviewer`): perspective, the standard it holds, what it does at
-   each gate, the evidence required to exit, and an anti-rationalization table.
-4. **Flip the gate row to LIVE** in both:
+3. **Fill every anatomy section** to match the built skills (use
+   `skills/helm-security-reviewer/SKILL.md` as the reference): perspective, the
+   standard it holds, when it fires (per gate), its method/checklist, its
+   **cross-team tensions** (the productive friction it carries with the other
+   roles), the evidence required to exit with explicit verdicts, and an
+   anti-rationalization table.
+4. **Wire it in** in both:
    - `skills/helm-orchestrator/SKILL.md` (the gate table), and
    - `skills/helm-router/SKILL.md` (the phase/request → role map).
-   Change the role's status from a `stub (v1.1)` wedge row to a `LIVE` row.
-5. **Keep `run_smoke_test.py` in lockstep** if you changed a selection or gate
-   table the script mirrors, then re-run it (`exit 0`).
+   And, if it is selected by the steering answers, add its row to the mapping
+   table in `skills/helm-onboarding/SKILL.md`.
+5. **Keep `run_smoke_test.py` in lockstep** with any selection or gate table you
+   touched, then re-run it (`exit 0`).
 
 ## Style
 
