@@ -17,13 +17,24 @@ auto-invoked specialists. The deterministic selection table in
 | UX Reviewer | `helm-ux-reviewer` | `Q3 = web` | Review |
 | Architect | `helm-architect` | `Q5 = yes` | Plan |
 
-## What lives here next
+## Domain packs (v1.1)
 
-This directory is reserved for the **domain-pack role libraries** (a later V1.1+
-phase): a domain-neutral founding core plus selectable packs — `software/`,
-`research-writing/`, `business-product/` — so HELM can assemble teams for a
-research paper or a business plan, not just software. The software roles above
-are the first, reference pack.
+HELM is domain-agnostic. A domain-neutral core (CEO, Counterweight, Product
+Keeper) plus a **Maker** and four **reviewer archetypes** (Integrity,
+Verification, Audience, Structure) are bound to concrete role skills by the
+active **pack**. Onboarding detects the domain, confirms it, and loads the pack.
+
+| Pack | `pack.md` | Maker | Integrity | Verification | Audience | Structure |
+|---|---|---|---|---|---|---|
+| software (default) | `software/pack.md` | Engineer | Security Reviewer | QA / Test | UX Reviewer | Architect |
+| research-writing | `research-writing/pack.md` | Writer | Sources Reviewer | Fact-Checker | Reader Advocate | Argument Architect |
+| business-product | `business-product/pack.md` | Operator | Compliance Reviewer | Evidence Checker | Stakeholder Reviewer | Strategy Architect |
+
+Each `pack.md` defines the domain's detection cues, its lifecycle vocabulary +
+mechanical completeness signals, its five steering questions, and the
+answer→archetype→role binding. The five risk dimensions and the mapping logic are
+identical across packs — only the wording, the bound roles, and the gate signals
+change.
 
 To build a new role: create `skills/helm-<role>/SKILL.md` with frontmatter
 (`name`, `description`), fill every anatomy section using

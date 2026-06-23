@@ -32,10 +32,11 @@ anything to disk until the MD approves the plan.
 ## The flow
 
 ```
-1. Describe   → MD states what the project is and who it is for
-2. Review     → You read what is already in the folder and report it back
+1. Describe    → MD states what the project is and who it is for
+2. Review      → You read what is already in the folder and report it back
+2b. Domain pack → Detect the domain, confirm it, and load that pack
 3. Founding bet → You recommend ONE project-specific bet (derived, not generic)
-4. Assemble team → Ask the 5 steering questions, apply the mapping table
+4. Assemble team → Ask the pack's 5 steering questions, apply the mapping
 5. Lay out plan → Show the first-sprint plan and the lifecycle gates
 6. Write       → Only after MD approves: write the artifacts to .helm/
 ```
@@ -63,6 +64,26 @@ package manifests). Report back, briefly:
 
 This grounds the founding bet in reality instead of in the description alone.
 
+## Step 2b — Select the domain pack
+
+HELM is domain-agnostic. The lifecycle, the CEO, the Counterweight, and the
+Product Keeper are the same for any project; the **domain pack** decides the
+steering questions' phrasing, which role plays each archetype, and the
+phase vocabulary + completeness signals. Detect the domain from the description
+and the folder, then **confirm with the MD** before loading it.
+
+| Pack | Detect when the work is… | Defined in |
+|---|---|---|
+| **software** (default) | an app, tool, service, API, library, CLI — or the folder has a source tree / manifest | `roles/software/pack.md` |
+| **research-writing** | a paper, essay, thesis, report, review, white paper, article | `roles/research-writing/pack.md` |
+| **business-product** | a business plan, strategy, market analysis, deck, PRD, model, proposal | `roles/business-product/pack.md` |
+
+State the detected pack in one line and ask the MD to confirm or switch:
+*"This looks like a research-writing project, so I'll assemble a research team —
+correct?"* If nothing clearly matches, default to **software** and say so. From
+here, the steering questions, the role binding, and the lifecycle vocabulary all
+come from the confirmed pack.
+
 ## Step 3 — Recommend a founding bet
 
 A **founding bet** is the single outcome the whole project is wagering on. It is
@@ -87,7 +108,11 @@ risking.
 
 ## Step 4 — Assemble the team
 
-Ask these **five steering questions**. Get an answer to each.
+Ask the confirmed pack's **five steering questions**. Get an answer to each. The
+questions below are the **software** pack's; for `research-writing` or
+`business-product`, use that pack's phrasing from its `pack.md`. The five risk
+dimensions and the mapping logic are identical across packs — only the wording
+and the role each archetype binds to change.
 
 ```
 Q1. Primary surface of risk?
@@ -102,15 +127,24 @@ Q5. Does the project involve custom protocols, multi-service coordination, or
 
 Now apply this mapping **mechanically**. Each matching condition adds a role.
 
-### Answer → role mapping (deterministic)
+### Answer → role mapping (deterministic — shown for the software pack)
 
-| Condition (read straight from the answers) | Role added | Status |
-|---|---|---|
-| Q2 = yes (network / file transfer) **OR** Q1 = security | **Security Reviewer** | built |
-| Q3 = web | **UX Reviewer** | built |
-| Q4 = yes **OR** Q1 = correctness | **QA / Test** | built |
-| Q5 = yes | **Architect** | built |
-| *always, regardless of answers* | **Orchestrator (CEO)**, **Counterweight**, **Product Keeper**, **Engineer** | built |
+| Condition (read straight from the answers) | Archetype | Role added (software) | Status |
+|---|---|---|---|
+| Q2 = yes (network / file transfer) **OR** Q1 = security | Integrity | **Security Reviewer** | built |
+| Q4 = yes **OR** Q1 = correctness | Verification | **QA / Test** | built |
+| Q3 = web | Audience | **UX Reviewer** | built |
+| Q5 = yes | Structure | **Architect** | built |
+| *always, regardless of answers* | CEO · Counterweight · Bet Keeper · Maker | **Orchestrator (CEO)**, **Counterweight**, **Product Keeper**, **Engineer** | built |
+
+**The conditions are the same in every pack; only the bound role changes.** For
+`research-writing` the Integrity role is `helm-sources-reviewer`, Verification is
+`helm-fact-checker`, Audience is `helm-reader-advocate`, Structure is
+`helm-argument-architect`, Maker is `helm-writer`. For `business-product` they are
+`helm-compliance-reviewer`, `helm-evidence-checker`, `helm-stakeholder-reviewer`,
+`helm-strategy-architect`, and `helm-operator`. The CEO, Counterweight, and
+Product Keeper are shared across all packs. Read the confirmed pack's `pack.md`
+for its exact binding.
 
 **Every role is built and auto-invoking.** Each assigned role carries a
 project-specific WHY and fires at its gate (see the Orchestrator gate table):
@@ -149,13 +183,15 @@ Status**. Ask the MD to confirm or adjust.
 
 Show the MD:
 
-1. The lifecycle the project will move through:
-   `spec → plan → build → verify → review → ship`
+1. The lifecycle the project will move through, in the **pack's vocabulary**:
+   `spec → plan → build → verify → review → ship` (software), or e.g.
+   `brief → method → draft → fact-check → editorial → publish` (research-writing).
 2. The **autonomous gates** the Orchestrator will enforce (see the
-   `helm-orchestrator` skill for the full gate table) — in particular, which
-   assigned specialist auto-fires at each gate. For this team, name them
-   explicitly, e.g. *"When spec.md is complete, I will route to Counterweight
-   automatically. When build is green, I will route to Security Reviewer."*
+   `helm-orchestrator` skill for the gate table and the pack's `pack.md` for its
+   completeness signals) — in particular, which assigned specialist auto-fires at
+   each gate. For this team, name them explicitly, e.g. *"When the spec is
+   complete, I route to Counterweight; when the draft is committed, I route to the
+   Fact-Checker."*
 3. The first sprint's candidate tasks, each annotated with its one-sentence link
    to the founding bet.
 
@@ -167,6 +203,7 @@ Only after approval. Create:
 
 ```
 .helm/founding-bet.md     # the accepted bet (outcome / assumption / invalidation)
+.helm/domain.md           # the confirmed pack name + its lifecycle vocabulary/signals
 .helm/team.md             # the roster: role, WHY-line, status, gate it fires at
 .helm/decisions.jsonl     # append the onboarding decision (see helm-orchestrator)
 ```

@@ -152,12 +152,26 @@ Every specialist carries its own **standard and cross-team tension** (e.g. QA's
 distills their findings into brief, non-technical updates for the MD — depth only
 when you ask.
 
+## Domain-agnostic (v1.1)
+
+HELM is no longer software-only. A domain-neutral core (CEO, Counterweight,
+Product Keeper) plus a Maker and four reviewer archetypes are bound to concrete
+roles by the active **pack**. Onboarding detects the domain, confirms it, and
+assembles the right team:
+
+- **software** (default) — Engineer · Security Reviewer · QA/Test · UX Reviewer · Architect
+- **research-writing** — Writer · Sources Reviewer · Fact-Checker · Reader Advocate · Argument Architect
+- **business-product** — Operator · Compliance Reviewer · Evidence Checker · Stakeholder Reviewer · Strategy Architect
+
+The same deterministic engine and lifecycle apply to all; each pack supplies its
+own steering questions, role binding, and mechanical gate signals (see
+`roles/<pack>/pack.md`). So a project can be a paper or a business plan, not just
+software.
+
 ## Scope (honest)
 
-**v1.1 assembles SOFTWARE-engineering teams with the full specialist roster.**
-A domain-agnostic core + packs (research/writing, business/product) so a project
-can be a paper or a plan — and **portfolio/multi-project orchestration** (one CEO
-across nested projects) are the **next V1.1 phases**, in progress.
+**Next V1.1 phase, in progress:** **portfolio/multi-project orchestration** — one
+CEO holding the exec view across nested projects to advise the MD.
 
 **Out of scope (v2, after adoption):** any learning corpus / lesson collection,
 telemetry or central data collection, scoring/ranking systems, and a dashboard.

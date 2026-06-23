@@ -4,15 +4,23 @@ HELM skill-pack smoke test.
 
 This is NOT the product. The product is the markdown in skills/. This script is a
 faithful, dependency-free mirror of the deterministic selection table in
-skills/helm-onboarding/SKILL.md and the gate table in
-skills/helm-orchestrator/SKILL.md. It exists to prove — reproducibly, for any
-future contributor — that the load-bearing case still passes:
+skills/helm-onboarding/SKILL.md, the archetype->role bindings in roles/<pack>/
+pack.md, and the gate table in skills/helm-orchestrator/SKILL.md.
 
-    input "a local-only browser-based file-transfer tool"
-      => the assembled team INCLUDES Security Reviewer with a project-specific WHY
-      => the CEO AUTO-INVOKES Security Reviewer at the Plan and Build gates
+It enforces two contracts:
 
-If a change to the table breaks that, this script exits non-zero.
+1. THE LOAD-BEARING SOFTWARE CASE (unchanged since v1):
+     input "a local-only browser-based file-transfer tool"
+       => the assembled team INCLUDES Security Reviewer with a project-specific WHY
+       => the CEO AUTO-INVOKES Security Reviewer at the Plan and Build gates
+
+2. THE AGNOSTIC-PACK CASE (v1.1):
+     input "a peer-reviewed research paper with empirical claims"
+       => the SAME deterministic engine binds the research-writing pack's roles
+          (Writer, Sources Reviewer, Fact-Checker, Reader Advocate, Argument
+          Architect) and NO software role names leak in.
+
+If a change to a table breaks either, this script exits non-zero.
 
 Run:  python3 run_smoke_test.py
 """
@@ -21,144 +29,195 @@ import sys
 from dataclasses import dataclass
 
 
-# --- the five steering answers (mirror of helm-onboarding Step 4) -------------
+# --- the five steering answers (the shared risk dimensions) -------------------
 @dataclass(frozen=True)
 class Answers:
-    q1_risk: str       # data_loss | security | user_confusion | performance | correctness | legal | none
-    q2_external: bool  # touches external systems, networks, or file transfer?
-    q3_interface: str  # cli | web | api | none
-    q4_correctness: bool  # one mistake causes harm?
-    q5_design: bool    # custom protocols / multi-service / data pipeline?
+    q1_risk: str       # primary risk surface (pack-flavoured vocabulary)
+    q2_external: bool  # touches external systems / sources / transfer?
+    q3_audience: str   # the consumer/audience surface ("none" => no audience role)
+    q4_correctness: bool  # is correctness/accuracy critical?
+    q5_design: bool    # needs deliberate structure/design?
 
 
 @dataclass(frozen=True)
 class Role:
     name: str
     why: str
-    status: str        # "built" | "stub (v1.1)"
+    status: str        # always "built" in v1.1
 
 
-# --- the deterministic selection table ---------------------------------------
+# --- archetype -> role binding per pack (mirror of roles/<pack>/pack.md) -------
+PACKS: dict[str, dict[str, str]] = {
+    "software": {
+        "maker": "Engineer",
+        "integrity": "Security Reviewer",
+        "verification": "QA / Test",
+        "audience": "UX Reviewer",
+        "structure": "Architect",
+    },
+    "research-writing": {
+        "maker": "Writer",
+        "integrity": "Sources Reviewer",
+        "verification": "Fact-Checker",
+        "audience": "Reader Advocate",
+        "structure": "Argument Architect",
+    },
+    "business-product": {
+        "maker": "Operator",
+        "integrity": "Compliance Reviewer",
+        "verification": "Evidence Checker",
+        "audience": "Stakeholder Reviewer",
+        "structure": "Strategy Architect",
+    },
+}
+
+# Q1 risk values (pack-flavoured) that trigger an archetype on their own.
+INTEGRITY_RISK = {"security", "misrepresentation", "legal-compliance"}
+VERIFICATION_RISK = {"correctness", "inaccuracy", "data-accuracy"}
+
+# The integrity standard, phrased per pack, so the WHY stays domain-faithful.
+INTEGRITY_STANDARD = {
+    "software": "transfers must be encrypted, authenticated, and integrity-checked.",
+    "research-writing": "every claim must trace to a credible, faithfully-represented source.",
+    "business-product": "every claim and commitment must be substantiated and defensible.",
+}
+
+
+# --- the deterministic selection engine (shared across all packs) -------------
 # Each rule references the answers in its WHY so the justification is generated
-# FROM the answers, never a template string. Keep this in lockstep with
-# skills/helm-onboarding/SKILL.md.
-def assemble_team(a: Answers) -> list[Role]:
+# FROM the answers, never a template string. Keep in lockstep with
+# skills/helm-onboarding/SKILL.md and roles/<pack>/pack.md.
+def assemble_team(a: Answers, pack: str) -> list[Role]:
+    b = PACKS[pack]
     team: list[Role] = [
         Role("Orchestrator (CEO)", "Always - coordinates the team and enforces the lifecycle gates.", "built"),
         Role("Counterweight", "Always - argues against the project's dominant assumption.", "built"),
         Role("Product Keeper", "Always - guards the founding bet.", "built"),
-        Role("Engineer", "Always - the implementer the CEO routes the build and the fixes to.", "built"),
+        Role(b["maker"], "Always - the maker the CEO routes the build and the fixes to.", "built"),
     ]
 
-    if a.q2_external or a.q1_risk == "security":
+    if a.q2_external or a.q1_risk in INTEGRITY_RISK:
         reasons = []
         if a.q2_external:
-            reasons.append("it transfers data over a network (Q2=yes)")
-        if a.q1_risk == "security":
-            reasons.append("security is the primary risk surface (Q1=security)")
-        why = ("Assigned because " + " and ".join(reasons) +
-               "; transfers must be encrypted, authenticated, and integrity-checked.")
-        team.append(Role("Security Reviewer", why, "built"))
+            reasons.append("it touches external systems / sources (Q2=yes)")
+        if a.q1_risk in INTEGRITY_RISK:
+            reasons.append(f"{a.q1_risk} is the primary risk surface (Q1)")
+        why = "Assigned because " + " and ".join(reasons) + "; " + INTEGRITY_STANDARD[pack]
+        team.append(Role(b["integrity"], why, "built"))
 
-    if a.q3_interface == "web":
-        team.append(Role("UX Reviewer",
-                         "Assigned because the interface is web (Q3=web): a stranger must understand the flow unaided.",
+    if a.q4_correctness or a.q1_risk in VERIFICATION_RISK:
+        why = ("Assigned because " +
+               ("a mistake causes real harm (Q4=yes)" if a.q4_correctness else f"{a.q1_risk} is the primary risk (Q1)") +
+               "; behaviour/claims need verification beyond the happy path.")
+        team.append(Role(b["verification"], why, "built"))
+
+    if a.q3_audience not in ("none", "", None):
+        team.append(Role(b["audience"],
+                         f"Assigned because there is an audience surface (Q3={a.q3_audience}): it must land with someone who did not build it.",
                          "built"))
 
-    if a.q4_correctness or a.q1_risk == "correctness":
-        why = ("Assigned because " +
-               ("a mistake causes real harm (Q4=yes)" if a.q4_correctness else "correctness is the primary risk (Q1=correctness)") +
-               "; behaviour needs verification beyond the happy path.")
-        team.append(Role("QA / Test", why, "built"))
-
     if a.q5_design:
-        team.append(Role("Architect",
-                         "Assigned because the project needs custom protocol / multi-service / pipeline design (Q5=yes).",
+        team.append(Role(b["structure"],
+                         "Assigned because the work needs deliberate structure/design (Q5=yes).",
                          "built"))
 
     return team
 
 
-# Always-on core: present on every team regardless of the answers.
-ALWAYS_ON = {"Orchestrator (CEO)", "Counterweight", "Product Keeper", "Engineer"}
+def always_on(pack: str) -> set[str]:
+    """The core present on every team of this pack: CEO, Counterweight, Bet Keeper, Maker."""
+    return {"Orchestrator (CEO)", "Counterweight", "Product Keeper", PACKS[pack]["maker"]}
 
 
-def is_fallback(team: list[Role]) -> bool:
+def is_fallback(team: list[Role], pack: str) -> bool:
     """Fallback = only the always-on core, no conditional reviewer mapped."""
-    return {r.name for r in team} == ALWAYS_ON
+    return {r.name for r in team} == always_on(pack)
 
 
-# --- the gate table: which assigned specialist auto-fires at each phase -------
-# Mirror of skills/helm-orchestrator/SKILL.md. Every roster role is LIVE. A role
-# is included at a gate only if it is on the team; order mirrors the gate table.
-def auto_invocations(team: list[Role]) -> dict[str, list[str]]:
-    names = {r.name for r in team}
-    gates: dict[str, list[str]] = {
-        "Spec":   ["Counterweight"],
-        "Verify": ["Counterweight"],
+# --- the gate table: which archetype auto-fires at each phase -----------------
+# Mirror of skills/helm-orchestrator/SKILL.md. Archetype-keyed so it is identical
+# across packs; the active pack binds each archetype to its role. Order mirrors
+# the gate table. A role fires only if it is on the team.
+GATE_ARCHETYPES: dict[str, list[str]] = {
+    "Spec":   ["counterweight"],
+    "Plan":   ["structure", "bet_keeper", "integrity"],
+    "Build":  ["verification", "integrity"],
+    "Verify": ["counterweight"],
+    "Review": ["bet_keeper", "audience"],
+}
+
+
+def auto_invocations(team: list[Role], pack: str) -> dict[str, list[str]]:
+    b = PACKS[pack]
+    arch_role = {
+        "counterweight": "Counterweight",
+        "bet_keeper": "Product Keeper",
+        "maker": b["maker"],
+        "integrity": b["integrity"],
+        "verification": b["verification"],
+        "audience": b["audience"],
+        "structure": b["structure"],
     }
-    # Plan: Architect -> Product Keeper -> Security Reviewer
-    if "Architect" in names:
-        gates.setdefault("Plan", []).append("Architect")
-    if "Product Keeper" in names:
-        gates.setdefault("Plan", []).append("Product Keeper")
-    if "Security Reviewer" in names:
-        gates.setdefault("Plan", []).append("Security Reviewer")
-    # Build: QA/Test -> Security Reviewer
-    if "QA / Test" in names:
-        gates.setdefault("Build", []).append("QA / Test")
-    if "Security Reviewer" in names:
-        gates.setdefault("Build", []).append("Security Reviewer")
-    # Review: Product Keeper -> UX Reviewer
-    if "Product Keeper" in names:
-        gates.setdefault("Review", []).append("Product Keeper")
-    if "UX Reviewer" in names:
-        gates.setdefault("Review", []).append("UX Reviewer")
-    # Engineer is the implementer routed DURING Build, not a gate-completion row.
+    present = {r.name for r in team}
+    gates: dict[str, list[str]] = {}
+    for phase, archs in GATE_ARCHETYPES.items():
+        for arch in archs:
+            role = arch_role[arch]
+            if role in present:
+                gates.setdefault(phase, []).append(role)
+    # The Maker is the implementer routed DURING Build, never a gate-completion row.
     return gates
 
 
-# --- the load-bearing test case ----------------------------------------------
-FILE_TRANSFER_CASE = Answers(
-    q1_risk="security",
-    q2_external=True,     # it transfers files over the local network
-    q3_interface="web",   # browser-based
-    q4_correctness=True,  # a corrupted or misdelivered file is real harm
-    q5_design=True,       # a local peer-to-peer transfer protocol
-)
-
-
-def main() -> int:
-    print("HELM skill-pack smoke test")
-    print("=" * 60)
-    print('Input: "a local-only browser-based file-transfer tool"\n')
-
-    team = assemble_team(FILE_TRANSFER_CASE)
-    gates = auto_invocations(team)
-
-    print("Assembled team:")
+def print_team(title: str, team: list[Role], gates: dict[str, list[str]]) -> None:
+    print(title)
     for r in team:
         print(f"  - {r.name:22} [{r.status:11}]  {r.why}")
-    print("\nAuto-invocations by gate (LIVE wedge rows):")
-    for phase, specialists in gates.items():
-        print(f"  - {phase:7} -> {', '.join(specialists)}")
+    print("  auto-invocations by gate:")
+    for phase in ("Spec", "Plan", "Build", "Verify", "Review"):
+        if phase in gates:
+            print(f"    - {phase:7} -> {', '.join(gates[phase])}")
     print()
 
-    # --- assertions: the contract this script exists to enforce --------------
-    failures: list[str] = []
 
+# --- case 1: the load-bearing software case ----------------------------------
+FILE_TRANSFER_CASE = Answers(
+    q1_risk="security",
+    q2_external=True,        # it transfers files over the local network
+    q3_audience="web",       # browser-based
+    q4_correctness=True,     # a corrupted or misdelivered file is real harm
+    q5_design=True,          # a local peer-to-peer transfer protocol
+)
+
+# --- case 2: the agnostic research-writing case ------------------------------
+RESEARCH_PAPER_CASE = Answers(
+    q1_risk="inaccuracy",
+    q2_external=True,            # relies on cited sources / empirical claims
+    q3_audience="peer-reviewers",  # a defined readership
+    q4_correctness=True,         # one wrong claim discredits the work
+    q5_design=True,              # a deliberate thesis / argument structure
+)
+
+SOFTWARE_ROLE_NAMES = {"Engineer", "Security Reviewer", "QA / Test", "UX Reviewer", "Architect"}
+
+
+def check_software() -> list[str]:
+    team = assemble_team(FILE_TRANSFER_CASE, "software")
+    gates = auto_invocations(team, "software")
+    print_team('Case 1 - software: "a local-only browser-based file-transfer tool"', team, gates)
+
+    failures: list[str] = []
     names = {r.name for r in team}
+
     if "Security Reviewer" not in names:
         failures.append("Security Reviewer is NOT on the team (Q2=yes / Q1=security must add it).")
-
-    if is_fallback(team):
-        failures.append("Team collapsed to the generic fallback trio — selection logic is broken.")
+    if is_fallback(team, "software"):
+        failures.append("Team collapsed to the always-on core — selection logic is broken.")
 
     sec = next((r for r in team if r.name == "Security Reviewer"), None)
     if sec is not None:
         if sec.status != "built":
-            failures.append("Security Reviewer must be a BUILT role in v1, not a stub.")
-        # WHY must reference the actual answers, not be a template.
+            failures.append("Security Reviewer must be a BUILT role, not a stub.")
         if "Q2" not in sec.why and "Q1" not in sec.why:
             failures.append("Security Reviewer WHY-line does not reference the answers (template smell).")
 
@@ -167,31 +226,65 @@ def main() -> int:
     if "Security Reviewer" not in gates.get("Build", []):
         failures.append("CEO does not auto-invoke Security Reviewer at the Build gate.")
 
-    # v1.1: every roster role is built — no stubs may remain.
     stubs = [r.name for r in team if r.status != "built"]
     if stubs:
-        failures.append(f"These roles are still stubs, must be built in v1.1: {', '.join(stubs)}.")
+        failures.append(f"These roles are still stubs, must be built: {', '.join(stubs)}.")
 
-    # v1.1: the newly-built roles must auto-fire at their gates for this team
-    # (the file-transfer case assigns all of them).
-    expected_gate_firings = [
-        ("Spec", "Counterweight"),
-        ("Plan", "Architect"),
-        ("Plan", "Product Keeper"),
-        ("Build", "QA / Test"),
-        ("Verify", "Counterweight"),
-        ("Review", "Product Keeper"),
-        ("Review", "UX Reviewer"),
-    ]
-    for phase, role in expected_gate_firings:
+    for phase, role in [("Spec", "Counterweight"), ("Plan", "Architect"), ("Plan", "Product Keeper"),
+                        ("Build", "QA / Test"), ("Verify", "Counterweight"),
+                        ("Review", "Product Keeper"), ("Review", "UX Reviewer")]:
         if role in names and role not in gates.get(phase, []):
             failures.append(f"CEO does not auto-invoke {role} at the {phase} gate.")
 
-    # Engineer is always on the team (the implementer), never a gate reviewer.
     if "Engineer" not in names:
         failures.append("Engineer (the standing implementer) is not on the team.")
     if any("Engineer" in v for v in gates.values()):
         failures.append("Engineer must NOT be a gate-completion reviewer — it is routed during Build.")
+
+    return failures
+
+
+def check_research() -> list[str]:
+    team = assemble_team(RESEARCH_PAPER_CASE, "research-writing")
+    gates = auto_invocations(team, "research-writing")
+    print_team('Case 2 - research-writing: "a peer-reviewed paper with empirical claims"', team, gates)
+
+    failures: list[str] = []
+    names = {r.name for r in team}
+
+    expected = {"Writer", "Sources Reviewer", "Fact-Checker", "Reader Advocate", "Argument Architect"}
+    for role in expected:
+        if role not in names:
+            failures.append(f"Research team is missing {role}.")
+
+    leaked = names & SOFTWARE_ROLE_NAMES
+    if leaked:
+        failures.append(f"Software role names leaked into the research pack: {', '.join(sorted(leaked))}.")
+
+    if is_fallback(team, "research-writing"):
+        failures.append("Research team collapsed to the always-on core — pack binding is broken.")
+
+    if any(r.status != "built" for r in team):
+        failures.append("A research role is not built.")
+
+    for phase, role in [("Spec", "Counterweight"), ("Plan", "Argument Architect"),
+                        ("Plan", "Sources Reviewer"), ("Build", "Fact-Checker"),
+                        ("Build", "Sources Reviewer"), ("Verify", "Counterweight"),
+                        ("Review", "Reader Advocate")]:
+        if role in names and role not in gates.get(phase, []):
+            failures.append(f"CEO does not auto-invoke {role} at the {phase} gate.")
+
+    if any("Writer" in v for v in gates.values()):
+        failures.append("Writer (the maker) must NOT be a gate-completion reviewer.")
+
+    return failures
+
+
+def main() -> int:
+    print("HELM skill-pack smoke test")
+    print("=" * 64)
+
+    failures = check_software() + check_research()
 
     if failures:
         print("RESULT: FAIL")
@@ -200,13 +293,11 @@ def main() -> int:
         return 1
 
     print("RESULT: PASS")
-    print("  ok  Security Reviewer is on the team")
-    print("  ok  its WHY-line is project-specific (references the answers)")
-    print("  ok  not the generic always-on core")
-    print("  ok  CEO auto-invokes Security Reviewer at the Plan and Build gates")
-    print("  ok  all roster roles are built (no stubs remain)")
-    print("  ok  Architect/Product Keeper/QA/UX auto-fire at their gates")
-    print("  ok  Engineer is the standing implementer, not a gate reviewer")
+    print("  ok  software: Security Reviewer on the team with an answer-derived WHY")
+    print("  ok  software: not the always-on core; auto-invoked at Plan and Build")
+    print("  ok  software: all roles built; Engineer is the implementer, not a gate reviewer")
+    print("  ok  research: same engine binds the research pack's roles")
+    print("  ok  research: no software role names leaked; gates fire for the bound roles")
     return 0
 
 

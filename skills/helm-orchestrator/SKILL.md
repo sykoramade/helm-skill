@@ -97,6 +97,27 @@ for the fix. The gates above check the reviewers; the Engineer produces the clea
 green, committed build the Build gate looks for. You still never implement
 yourself: you dispatch to the Engineer.
 
+### Domain packs (the table above is the software/default binding)
+
+HELM is domain-agnostic. The gate table above shows the **software** pack — its
+completeness signals (build command, test command, `dist/`) and its bound roles
+(Architect, Security Reviewer, QA/Test, UX Reviewer, Engineer). Read
+`.helm/domain.md` to see which pack is active. For a non-software pack:
+
+- **The signals come from the pack.** Use the completeness-signal table in
+  `roles/<pack>/pack.md` instead of the software signals — e.g. research-writing's
+  Build gate checks `draft.md` committed (no build command), and its Verify gate
+  checks a `citations-checked.md` log. The signals stay mechanical and checkable;
+  only *what* you check changes.
+- **The roles come from the pack.** Each gate names an **archetype**; the active
+  pack binds it to a role. The structure reviewer at Plan is the Architect in
+  software, the Argument Architect in research-writing, the Strategy Architect in
+  business-product. Counterweight, Product Keeper, and the CEO are the same in
+  every pack.
+
+Everything else — the order within a gate, the structure-vs-quality rule, the
+announce-and-log discipline — is identical regardless of pack.
+
 ### Rules for the gate
 
 - **Structure vs. quality.** The gate only checks that structure exists. Whether

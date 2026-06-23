@@ -16,6 +16,13 @@ Detect the current phase from repo state, then return the specialist(s) for the
 gate that just completed. This mirrors the Orchestrator's gate table exactly —
 keep them in sync.
 
+> **Domain packs.** The detection signals and role names below are the
+> **software** pack. Read `.helm/domain.md` for the active pack; for a
+> non-software pack, use that pack's completeness signals and archetype→role
+> binding from `roles/<pack>/pack.md` (e.g. the Build phase completes on
+> `draft.md` committed, and the structure role is the Argument Architect). The
+> phase order and routing logic are identical across packs.
+
 ### How to detect the current phase (mechanical)
 
 Check in order; the **last** condition that is satisfied is the completed phase:
