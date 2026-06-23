@@ -1,4 +1,9 @@
-# HELM
+#                          
+ _____ _____ __    _____ 
+|  |  |   __|  |  |     |
+|     |   __|  |__| | | |
+|__|__|_____|_____|_|_|_|
+                         
 
 **HELM orchestrates a project-specific AI team — you are the MD, HELM is the CEO,
 and specialists are auto-invoked at lifecycle gates.**
