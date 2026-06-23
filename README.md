@@ -1,8 +1,9 @@
-                        
+```                        
  _____ _____ __    _____ 
 |  |  |   __|  |  |     |
 |     |   __|  |__| | | |
 |__|__|_____|_____|_|_|_|
+```
                          
 
 **HELM orchestrates a project-specific AI team — you are the MD, HELM is the CEO,
