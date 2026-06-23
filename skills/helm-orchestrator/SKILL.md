@@ -178,11 +178,18 @@ every auto-invocation is appended to `.helm/decisions.jsonl`, one JSON object pe
 line:
 
 ```json
-{"phase": "spec", "event": "gate_fired", "signal": "spec.md has Founding Bet/Problem/Success Criteria/Scope", "specialist": "counterweight", "verdict": "CHALLENGE", "confidence": 7.5, "note": "dominant assumption untested"}
+{"ts": "2026-06-23T14:02:00Z", "phase": "spec", "event": "gate_fired", "signal": "spec.md has Founding Bet/Problem/Success Criteria/Scope", "specialist": "counterweight", "verdict": "CHALLENGE", "confidence": 7.5, "note": "dominant assumption untested"}
 ```
 
 Recommended `event` values: `gate_fired`, `routing_decision`, `specialist_verdict`,
 `phase_transition`, `scope_rejected`, `escalate_to_md`, `final_ship_decision`.
+
+Include an ISO-8601 `ts` on every line, and the `confidence` and `verdict` fields
+where they apply. These are what the **Portfolio CEO** (`helm-portfolio`) reads to
+derive a project's status across a portfolio — an `escalate_to_md` with no later
+resolution, a low `confidence`, or a `CHALLENGE`/`REJECT`/`FAIL` with no later
+`phase_transition` is how it knows a project needs the MD or is blocked. Log at
+the moment of the decision so that view is always current.
 
 ## Verdicts you issue
 

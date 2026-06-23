@@ -43,6 +43,21 @@ anything to disk until the MD approves the plan.
 
 Walk these in order. Get an explicit "yes / approved / go" before advancing.
 
+## Where the project is created (portfolio-aware)
+
+Before Step 1, determine where this project lives:
+
+- **Standalone** — the current folder is the project. Write `.helm/` here (the v1
+  behavior). Use this when there is no portfolio root.
+- **Inside a portfolio** — the current folder is a **portfolio root** (it contains
+  `.helm/portfolio.jsonl`), or the **Portfolio CEO** (`helm-portfolio`) invoked
+  you and named a root. Then create the project in a **new nested subfolder**
+  `<root>/<project-slug>/`, write that project's `.helm/` there (never into the
+  root's `.helm/`), and register it in the root's `.helm/portfolio.jsonl` at the
+  end. Derive `<project-slug>` from the name; confirm it with the MD.
+
+Everything else in the flow is identical either way.
+
 ---
 
 ## Step 1 — Describe
@@ -199,7 +214,9 @@ Ask for approval to write.
 
 ## Step 6 — Write the artifacts
 
-Only after approval. Create:
+Only after approval. Create these in the project's `.helm/` — which is the
+nested `<root>/<project-slug>/.helm/` when inside a portfolio, or the current
+folder's `.helm/` when standalone (see *Where the project is created*):
 
 ```
 .helm/founding-bet.md     # the accepted bet (outcome / assumption / invalidation)
@@ -208,9 +225,12 @@ Only after approval. Create:
 .helm/decisions.jsonl     # append the onboarding decision (see helm-orchestrator)
 ```
 
-Append one line to `.helm/decisions.jsonl` recording the team assembled and the
-answers that produced it, so the selection is auditable. Then hand off to the
-`helm-orchestrator` skill to begin the lifecycle.
+Append one line to the project's `.helm/decisions.jsonl` recording the team
+assembled and the answers that produced it, so the selection is auditable. If
+this project was created inside a portfolio, also append one
+`project_registered` line to the **root's** `.helm/portfolio.jsonl` (see
+`helm-portfolio`). Then hand off to the `helm-orchestrator` skill to begin the
+lifecycle.
 
 ---
 

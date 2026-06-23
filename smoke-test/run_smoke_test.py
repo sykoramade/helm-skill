@@ -180,6 +180,37 @@ def print_team(title: str, team: list[Role], gates: dict[str, list[str]]) -> Non
     print()
 
 
+# --- portfolio aggregation (mirror of skills/helm-portfolio/SKILL.md) ---------
+@dataclass(frozen=True)
+class ProjectState:
+    name: str
+    open_escalation: bool       # unresolved escalate_to_md in decisions.jsonl
+    last_verdict: str           # latest specialist verdict (PASS/CHALLENGE/REJECT/FAIL/none)
+    transition_since: bool      # a phase_transition logged AFTER that verdict
+    confidence: float | None    # latest recorded confidence
+    stale: bool                 # no decisions.jsonl entry within the staleness window
+
+
+STATUS_RANK = {"NEEDS-MD": 0, "BLOCKED": 1, "STALE": 2, "ON-TRACK": 3}
+
+
+def project_status(p: ProjectState) -> str:
+    # first match wins — mirrors the helm-portfolio status table
+    if p.open_escalation or (p.confidence is not None and p.confidence < 7.0):
+        return "NEEDS-MD"
+    if p.last_verdict in {"CHALLENGE", "REJECT", "FAIL"} and not p.transition_since:
+        return "BLOCKED"
+    if p.stale:
+        return "STALE"
+    return "ON-TRACK"
+
+
+def portfolio_order(states: list[ProjectState]) -> list[ProjectState]:
+    # tier first (NEEDS-MD -> BLOCKED -> STALE -> ON-TRACK), then lowest confidence first
+    return sorted(states, key=lambda p: (STATUS_RANK[project_status(p)],
+                                         p.confidence if p.confidence is not None else 7.0))
+
+
 # --- case 1: the load-bearing software case ----------------------------------
 FILE_TRANSFER_CASE = Answers(
     q1_risk="security",
@@ -280,11 +311,49 @@ def check_research() -> list[str]:
     return failures
 
 
+# --- case 3: portfolio aggregation across nested projects --------------------
+PORTFOLIO = [
+    ProjectState("acme-app",        open_escalation=True,  last_verdict="PASS",      transition_since=True,  confidence=None, stale=False),
+    ProjectState("q3-paper",        open_escalation=False, last_verdict="CHALLENGE", transition_since=False, confidence=8.0,  stale=False),
+    ProjectState("market-analysis", open_escalation=False, last_verdict="PASS",      transition_since=True,  confidence=6.5,  stale=False),
+    ProjectState("old-prototype",   open_escalation=False, last_verdict="PASS",      transition_since=True,  confidence=8.0,  stale=True),
+    ProjectState("docs-site",       open_escalation=False, last_verdict="PASS",      transition_since=True,  confidence=9.0,  stale=False),
+]
+
+
+def check_portfolio() -> list[str]:
+    failures: list[str] = []
+    statuses = {p.name: project_status(p) for p in PORTFOLIO}
+
+    print("Case 3 - portfolio: 5 nested projects")
+    for p in portfolio_order(PORTFOLIO):
+        print(f"  - {p.name:16} {project_status(p)}")
+    print()
+
+    expected = {
+        "acme-app": "NEEDS-MD",        # unresolved escalation
+        "market-analysis": "NEEDS-MD", # confidence < 7.0
+        "q3-paper": "BLOCKED",         # CHALLENGE, no transition since
+        "old-prototype": "STALE",      # no movement in the window
+        "docs-site": "ON-TRACK",       # clean
+    }
+    for name, want in expected.items():
+        if statuses[name] != want:
+            failures.append(f"Portfolio status for {name} should be {want}, got {statuses[name]}.")
+
+    order = [p.name for p in portfolio_order(PORTFOLIO)]
+    want_order = ["market-analysis", "acme-app", "q3-paper", "old-prototype", "docs-site"]
+    if order != want_order:
+        failures.append(f"Portfolio priority order wrong: {order} != {want_order}.")
+
+    return failures
+
+
 def main() -> int:
     print("HELM skill-pack smoke test")
     print("=" * 64)
 
-    failures = check_software() + check_research()
+    failures = check_software() + check_research() + check_portfolio()
 
     if failures:
         print("RESULT: FAIL")
@@ -298,6 +367,8 @@ def main() -> int:
     print("  ok  software: all roles built; Engineer is the implementer, not a gate reviewer")
     print("  ok  research: same engine binds the research pack's roles")
     print("  ok  research: no software role names leaked; gates fire for the bound roles")
+    print("  ok  portfolio: project statuses derived deterministically from the log")
+    print("  ok  portfolio: briefing ordered NEEDS-MD -> BLOCKED -> STALE -> ON-TRACK")
     return 0
 
 

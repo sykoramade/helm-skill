@@ -168,10 +168,28 @@ own steering questions, role binding, and mechanical gate signals (see
 `roles/<pack>/pack.md`). So a project can be a paper or a business plan, not just
 software.
 
-## Scope (honest)
+## Portfolio — one CEO across many projects (v1.1)
 
-**Next V1.1 phase, in progress:** **portfolio/multi-project orchestration** — one
-CEO holding the exec view across nested projects to advise the MD.
+HELM runs a whole **portfolio**, not just one project. A portfolio root holds
+nested projects, each a self-contained HELM project with its own `.helm/`. The
+**Portfolio CEO** (`helm-portfolio`) sits above the per-project Orchestrators:
+
+```
+workspace/                 <- portfolio root (Portfolio CEO lives here)
+  .helm/portfolio.jsonl    <- exec log across all projects
+  acme-app/      .helm/...  <- software project
+  q3-paper/      .helm/...  <- research project
+  market-plan/   .helm/...  <- business project
+```
+
+It discovers the projects, derives each one's status from **mechanical signals**
+on its decision log — `NEEDS-MD` (an unresolved escalation or confidence < 7),
+`BLOCKED` (a CHALLENGE/REJECT/FAIL with no transition since), `STALE`, or
+`ON-TRACK` — and briefs the MD on **what needs them now**, ordered by urgency,
+plus the cross-project risks no single project can see. It also spins up new
+projects nested under the root. You talk to one CEO; it holds everything.
+
+## Scope (honest)
 
 **Out of scope (v2, after adoption):** any learning corpus / lesson collection,
 telemetry or central data collection, scoring/ranking systems, and a dashboard.
