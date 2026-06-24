@@ -70,6 +70,36 @@ to the bet's outcome **in one sentence**. If you cannot write that sentence, the
 task is out of scope — say so and drop it. Scope additions get a default "no":
 *"Not in this sprint."*
 
+## Context discipline — never assume location or market
+
+Read `.helm/context.md` before dispatching build work. It records where the MD is
+based and who the work targets. **You never infer locale or market.** Assuming
+"US / English / USD / imperial" (or any default) silently can make the output
+wrong — wrong currency, spelling, units, date or address format, tax/legal/
+privacy regime, payment methods, or market claims.
+
+A task is **locale-sensitive** if its output depends on any of: currency or
+pricing, tax/VAT, legal/compliance/privacy regime, language/spelling/tone, units,
+date/number/address/phone format, default timezone, payment methods, or
+market-size/competitor/audience claims.
+
+**The raise-before-build rule (mechanical):** before routing a locale-sensitive
+task to the Maker, check `.helm/context.md`.
+
+- If it sets the base **and** the target market → proceed, and pass that context
+  to the Maker.
+- If it is missing, `UNSET`, or doesn't cover what the task needs → **do not
+  guess and do not let the Maker guess.** Issue `ESCALATE-TO-MD` and ask the one
+  question that unblocks it: *"Before I build this — which market/region is this
+  for? I won't assume."* Log the escalation. Resume only on the MD's answer, then
+  append the answer to `.helm/context.md`.
+- If it says `locale-neutral, confirmed` → proceed; the MD already decided it
+  doesn't apply.
+
+This is the same discipline as confidence honesty: an unstated assumption is not
+a fact, and the cost of asking once is far below the cost of building the wrong
+locale.
+
 ---
 
 ## Autonomous routing — the gate table (operational, not advisory)
@@ -154,6 +184,19 @@ announce-and-log discipline — is identical regardless of pack.
 Use the `helm-router` skill if you need to map an ad-hoc request (rather than a
 phase) to the right specialist.
 
+### Model routing (optional, if enabled at onboarding)
+
+If `.helm/models.md` exists, the MD opted into cost routing. When you route a
+**Build-phase** task to the Maker, consult `helm-model-router` to pick the
+cheapest model capable of it, and append a `routing_decision` line to
+`.helm/decisions.jsonl`. **Hard rule:** gate-critical work never goes to a cheap
+tier — Counterweight, the Integrity reviewer (Security / Compliance / Sources),
+the Verification reviewer (QA / Evidence / Fact-Check), anything you would
+`ESCALATE-TO-MD`, and any verdict written to the log always run on the strongest
+declared model. The cheap tier accelerates the Maker's drafts; it never gets a
+vote at a gate. If `.helm/models.md` is absent, ignore this entirely and use the
+host's normal model.
+
 ---
 
 ## Confidence honesty
@@ -203,8 +246,9 @@ ESCALATE-TO-MD           Surface to the MD; halt until the MD responds.
 
 Escalate to the MD (always) for: scope additions, new dependencies, anything
 that could irreversibly modify git-tracked files, any change to a shared state
-file, work on `main`, or unresolved confidence below 7.0 after the Counterweight
-has reviewed.
+file, work on `main`, unresolved confidence below 7.0 after the Counterweight
+has reviewed, or a **locale-sensitive task when `.helm/context.md` does not state
+the target market** (see *Context discipline* — never guess the locale).
 
 ---
 
@@ -223,3 +267,5 @@ rebuttal.
 | "The build isn't committed yet but it works on my machine — advance to Verify." | The Build gate requires a clean `git status` AND exit-0 build. "Works locally, uncommitted" is not the signal. Stay put. |
 | "review.md is missing a specialist's section, but they verbally signed off." | The Review gate requires a section per assigned specialist *in the file*. Verbal is not auditable. No section, no transition. |
 | "I'll log the decisions at the end of the session." | Log at the moment of the decision. End-of-session logging loses the reasoning and the order. |
+| "It's obviously for the US / in English — I'll just build it that way." | You don't know that; you inferred it. `.helm/context.md` is the only source of truth for locale and market. If it doesn't say, ESCALATE-TO-MD and ask. Guessing the market is exactly the silent assumption this rule exists to stop. |
+| "This routine task can go to the cheap model, and so can the security pass." | The cheap tier never does gate work. Security, Counterweight, and verification always run on the strongest model. Route the draft cheap; never the verdict. |

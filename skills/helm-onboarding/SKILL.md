@@ -35,8 +35,10 @@ anything to disk until the MD approves the plan.
 1. Describe    → MD states what the project is and who it is for
 2. Review      → You read what is already in the folder and report it back
 2b. Domain pack → Detect the domain, confirm it, and load that pack
+2c. Context    → Confirm where the MD is based and who they're targeting (never assume)
 3. Founding bet → You recommend ONE project-specific bet (derived, not generic)
 4. Assemble team → Ask the pack's 5 steering questions, apply the mapping
+4b. Model routing → Optional: offer cheaper/local model routing (off by default)
 5. Lay out plan → Show the first-sprint plan and the lifecycle gates
 6. Write       → Only after MD approves: write the artifacts to .helm/
 ```
@@ -98,6 +100,36 @@ State the detected pack in one line and ask the MD to confirm or switch:
 correct?"* If nothing clearly matches, default to **software** and say so. From
 here, the steering questions, the role binding, and the lifecycle vocabulary all
 come from the confirmed pack.
+
+## Step 2c — Confirm context (where based, who targeted)
+
+**Never infer location or market. Ask, or detect-then-confirm — never assume.**
+A tool that silently decides "this is for the US in English" can produce wrong
+output: wrong currency, spelling, units, date format, tax/legal regime, or
+market claims. HELM does not guess this; it puts it on the record before the bet
+is set, because the bet and the build both depend on it.
+
+Capture two things:
+
+1. **Where the MD / team is based** — drives default language, spelling, units,
+   date and number format, currency, and the legal/tax/privacy regime.
+2. **The target market / audience and its region(s)** — who the output is *for*.
+   This can differ from where the MD is based (e.g. based in Australia, selling
+   into the EU).
+
+**Detect-then-confirm, don't bake in.** If the description or the folder carries
+a locale signal (a currency symbol, a country name, `en-US`/`en-GB`, GDPR/HIPAA,
+metric vs imperial units), you may *propose* it — but you must surface it for a
+yes/no, never apply it silently:
+
+> *"I see prices written in USD and US spelling — should I treat the target
+> market as the United States, English (US)? Or is it somewhere else?"*
+
+If the MD says it's locale-neutral or doesn't matter, **record that as an explicit
+decision** ("locale-neutral, confirmed") so it is a choice on the record, not a
+silent assumption. If the MD is unsure, leave it unset and tell them the CEO will
+raise it before any locale-sensitive build (see `helm-orchestrator`) rather than
+guess. This is written to `.helm/context.md` at Step 6.
 
 ## Step 3 — Recommend a founding bet
 
@@ -194,6 +226,28 @@ answers**, referencing them. Never a template string.
 Present the assembled team as a table: **Role · WHY (referencing the answers) ·
 Status**. Ask the MD to confirm or adjust.
 
+## Step 4b — Offer model routing (optional, off by default)
+
+HELM works with zero config on the host's normal model. *Optionally*, the CEO can
+route routine, low-risk Build-phase work to a cheaper or local model to cut cost.
+Offer it in one line; do not push it:
+
+> *"Optional: I can send routine, low-risk work to a cheaper or local model
+> (e.g. Ollama) to cut cost — keeping every gate reviewer (Security,
+> Counterweight, QA) on your strongest model. Want that? It needs one model
+> declared in `helm-models.toml`."*
+
+Rules:
+
+- **Default off.** If the MD declines, or there's no `helm-models.toml`, or no
+  endpoint is reachable, skip it silently — no behaviour change.
+- **Gate reviewers never go cheap.** Counterweight, the Integrity reviewer, and
+  the Verification reviewer always run on the strongest declared model (see
+  `helm-model-router` §4). Say this plainly so the MD knows quality gates are
+  untouched.
+- If the MD opts in, note the lineup so it can be written to `.helm/models.md` at
+  Step 6. The mechanics live in the `helm-model-router` skill.
+
 ## Step 5 — Lay out the plan
 
 Show the MD:
@@ -221,9 +275,19 @@ folder's `.helm/` when standalone (see *Where the project is created*):
 ```
 .helm/founding-bet.md     # the accepted bet (outcome / assumption / invalidation)
 .helm/domain.md           # the confirmed pack name + its lifecycle vocabulary/signals
+.helm/context.md          # base location + target market/audience (or "locale-neutral, confirmed")
 .helm/team.md             # the roster: role, WHY-line, status, gate it fires at
+.helm/models.md           # ONLY if the MD opted into routing at 4b: the model lineup
 .helm/decisions.jsonl     # append the onboarding decision (see helm-orchestrator)
 ```
+
+Write `.helm/context.md` with the base location, the target market/audience and
+its region(s), and the locale conventions that follow (language/spelling,
+currency, units, date format, regulatory regime) — or the single line
+`locale-neutral, confirmed` if the MD declared it doesn't apply. If the MD left it
+unset, write `context.md` with `UNSET — raise before any locale-sensitive build`
+so the Orchestrator's guardrail fires. Write `.helm/models.md` only if the MD
+opted into routing at Step 4b.
 
 Append one line to the project's `.helm/decisions.jsonl` recording the team
 assembled and the answers that produced it, so the selection is auditable. If
