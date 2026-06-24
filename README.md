@@ -8,9 +8,9 @@
                                                                             
 ```
 
-**Run a project with an AI team where you're the boss.**
+**Run a multiple projects within AI organization where you're the boss.**
 
-You're the MD. HELM is the CEO. Specialists do the work — and the CEO pulls in the
+You're the MD. HELM is the CEO. Teams are spun up for new projects and specialists do the work — and the CEO pulls in the
 right one *automatically* at each stage, on fixed rules instead of guesswork.
 
 It's just markdown. No service, no account, no telemetry. Every decision is logged
