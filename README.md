@@ -99,14 +99,6 @@ CEO** sits above them, reads each decision log, and tells you what needs you now
 `NEEDS-MD`, `BLOCKED`, `STALE`, or `ON-TRACK` — in priority order, plus the
 cross-project risks no single project can see. You talk to one CEO; it holds it all.
 
-## It won't guess your market
-
-HELM asks where you're based and who you're targeting, and writes it to
-`.helm/context.md`. It never silently assumes "US / English / USD". If a task
-depends on locale — currency, units, dates, language, tax, legal, market claims —
-and the market isn't on record, the CEO **stops and asks before building** rather
-than ship the wrong thing.
-
 ## Bring your own models (optional)
 
 `helm-model-router` sends routine, low-risk work to the cheapest model that can do
@@ -140,18 +132,6 @@ The skills are plain markdown — they work anywhere that reads instructions.
 No server, no telemetry, no account. **Out of scope (until v2):** any learning
 corpus, central data collection, scoring/ranking, or a dashboard. Nothing to opt
 out of, nothing to trust us with.
-
-## Prove it
-
-```bash
-python3 smoke-test/run_smoke_test.py    # no dependencies, exits 0 on PASS
-```
-
-One load-bearing case: *"a local-only browser-based file-transfer tool"* must
-produce a team that **includes Security Reviewer with a project-specific reason**,
-auto-invoked at the Plan and Build gates — not a generic trio, not waiting to be
-asked. The script mirrors the selection and gate tables exactly, so it doubles as
-a regression test.
 
 ## Troubleshooting
 
