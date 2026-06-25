@@ -27,6 +27,9 @@ Run:  python3 run_smoke_test.py
 from __future__ import annotations
 import sys
 from dataclasses import dataclass
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 # --- the five steering answers (the shared risk dimensions) -------------------
@@ -349,11 +352,65 @@ def check_portfolio() -> list[str]:
     return failures
 
 
+# --- case 4: v1.3 standing-rule artifacts (packaging invariants) -------------
+def _read(rel: str) -> str:
+    p = REPO_ROOT / rel
+    return p.read_text(encoding="utf-8") if p.exists() else ""
+
+
+def check_v13_artifacts() -> list[str]:
+    print("Case 4 - v1.3 standing rules: operating-rule + update-check")
+    failures: list[str] = []
+
+    rule = _read("skills/helm-operating-rule/SKILL.md")
+    upd = _read("skills/helm-update-check/SKILL.md")
+
+    if not rule:
+        failures.append("skills/helm-operating-rule/SKILL.md is missing.")
+    else:
+        # §3 canonical portfolio root name must be consistent across the pack
+        if "helm-skill-portfolio/" not in rule:
+            failures.append("Operating rule §3 must name the canonical root 'helm-skill-portfolio/'.")
+        # §1 must keep grunt work off the orchestrating model and gate work off cheap
+        # tiers — require the load-bearing terms to co-occur, not just appear somewhere
+        if not ("ESCALATE-TO-MD" in rule
+                and "cheap tier" in rule
+                and "never" in rule.lower()):
+            failures.append("Operating rule §1 must keep gate-critical work (ESCALATE-TO-MD) "
+                            "off the cheap tier (look for 'never ... cheap tier').")
+
+    if not upd:
+        failures.append("skills/helm-update-check/SKILL.md is missing.")
+    elif "/plugin marketplace update helm-skill" not in upd:
+        failures.append("Update check must recommend '/plugin marketplace update helm-skill'.")
+
+    # the three entry points must load both standing skills as Step 0
+    for entry in ("helm-orchestrator", "helm-onboarding", "helm-portfolio"):
+        body = _read(f"skills/{entry}/SKILL.md")
+        if "helm-operating-rule" not in body:
+            failures.append(f"{entry} does not load helm-operating-rule at startup.")
+        if "helm-update-check" not in body:
+            failures.append(f"{entry} does not load helm-update-check at startup.")
+
+    # the canonical root name must match the portfolio skill's layout
+    if "helm-skill-portfolio/" not in _read("skills/helm-portfolio/SKILL.md"):
+        failures.append("helm-portfolio must use the canonical root 'helm-skill-portfolio/'.")
+
+    # version must be bumped to 1.3.x
+    if '"version": "1.3' not in _read(".claude-plugin/plugin.json"):
+        failures.append("plugin.json version must be bumped to 1.3.x.")
+
+    print(f"  - operating-rule present: {bool(rule)}   update-check present: {bool(upd)}")
+    print()
+    return failures
+
+
 def main() -> int:
     print("HELM skill-pack smoke test")
     print("=" * 64)
 
-    failures = check_software() + check_research() + check_portfolio()
+    failures = (check_software() + check_research() + check_portfolio()
+                + check_v13_artifacts())
 
     if failures:
         print("RESULT: FAIL")
@@ -369,6 +426,8 @@ def main() -> int:
     print("  ok  research: no software role names leaked; gates fire for the bound roles")
     print("  ok  portfolio: project statuses derived deterministically from the log")
     print("  ok  portfolio: briefing ordered NEEDS-MD -> BLOCKED -> STALE -> ON-TRACK")
+    print("  ok  v1.3: operating-rule + update-check present and loaded by all entry points")
+    print("  ok  v1.3: canonical portfolio root and 1.3.x version are consistent")
     return 0
 
 

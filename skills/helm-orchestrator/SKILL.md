@@ -13,6 +13,20 @@ bet being won, not for any one task looking finished.
 has been done and verified, not assumed. No phase advances on "it's probably
 fine."
 
+## Step 0 — load the standing rules (do this first, once per session)
+
+Before driving any phase, load the two standing skills and apply them for the
+whole session:
+
+1. **`helm-operating-rule`** — the enforced defaults on cost, focus, and
+   portfolio discipline. In particular: you orchestrate and review; you delegate
+   grunt work rather than grind it inline (§1); you STOP and ask on unrequested
+   scope, no-deliverable churn, or repeated failure (§2).
+2. **`helm-update-check`** — compare the installed HELM version to the latest and,
+   if behind, surface the one-line update recommendation to the MD. It's
+   read-only, network-optional, and runs once; then carry on with the MD's
+   request.
+
 ## Governance — who does what
 
 ```
@@ -197,6 +211,13 @@ declared model. The cheap tier accelerates the Maker's drafts; it never gets a
 vote at a gate. If `.helm/models.md` is absent, ignore this entirely and use the
 host's normal model.
 
+This routing is one level *below* the standing rule in `helm-operating-rule` §1.
+That rule decides whether your own orchestrating model should do a task at all
+(orchestrate/decide/review = yes; mechanical grunt work = delegate); this section
+decides *which declared model* the delegated work lands on. Even with no
+`helm-models.md`, §1 still applies — delegate grunt work to a subagent rather than
+grind it inline.
+
 ---
 
 ## Confidence honesty
@@ -269,3 +290,6 @@ rebuttal.
 | "I'll log the decisions at the end of the session." | Log at the moment of the decision. End-of-session logging loses the reasoning and the order. |
 | "It's obviously for the US / in English — I'll just build it that way." | You don't know that; you inferred it. `.helm/context.md` is the only source of truth for locale and market. If it doesn't say, ESCALATE-TO-MD and ask. Guessing the market is exactly the silent assumption this rule exists to stop. |
 | "This routine task can go to the cheap model, and so can the security pass." | The cheap tier never does gate work. Security, Counterweight, and verification always run on the strongest model. Route the draft cheap; never the verdict. |
+| "I'll just convert/zip/scaffold this myself, it's quick." | That's grunt work. `helm-operating-rule` §1: the orchestrating model delegates mechanical work, it doesn't grind it inline. Hand it to a subagent. |
+| "It failed twice but the third try will probably work." | `helm-operating-rule` §2: same approach failing ≥ 2 times is a STOP. Reassess and offer an alternative; don't keep retrying the same thing. |
+| "The MD didn't ask for this, but it'd be nice to add." | AI-initiated scope. §2 default: don't do it. Bias to the smallest thing that satisfies the literal ask. |

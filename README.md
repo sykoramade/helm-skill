@@ -69,6 +69,8 @@ the right specialist the moment each gate's signal is met.
 helm-onboarding       Turn one line into a team + a founding bet.
 helm-orchestrator     The CEO. Runs the lifecycle, fires the gates.
 helm-router           Maps a phase or request to the right specialist.
+helm-operating-rule   Standing defaults: delegate grunt work, guard scope, one portfolio root.
+helm-update-check     Checks for a newer HELM on startup, recommends the update.
 
 helm-counterweight    Argues against your dominant assumption. Fires at Spec, Verify.
 helm-product-keeper   Guards the founding bet, cuts scope drift. Fires at Plan, Review.
@@ -143,6 +145,29 @@ out of, nothing to trust us with.
   GitHub URLs to HTTPS: `git config --global url."https://github.com/".insteadOf "git@github.com:"`, then retry.
 - **Marketplace won't load.** Update it: `/plugin marketplace update helm-skill`,
   then `/reload-plugins`.
+
+## What's new
+
+A running list of what each release added. Newest first.
+
+- **v1.3** — **Operating rule** (`helm-operating-rule`): enforced defaults on cost
+  (delegate grunt work, don't grind it inline), focus (every task traces to the
+  founding bet or stops), and portfolio structure (one `helm-skill-portfolio/`
+  root, every project a child, mandatory relocation for strays). **Startup update
+  check** (`helm-update-check`): compares your installed version to the latest and
+  recommends the one-line update — read-only, network-optional.
+- **v1.2** — **Model routing** (`helm-model-router`): bring your own models and
+  route routine work to the cheapest one that can do it; gate reviewers always run
+  on your strongest model. **Locale/market guardrail**: HELM never silently assumes
+  "US / English / USD" — it asks and writes `.helm/context.md`.
+- **v1.1** — **Domain-agnostic core** with three packs (software · research-writing
+  · business-product) bound through an explicit archetype→role table. The full
+  specialist team built out as live skills. **Portfolio orchestration**: nest
+  projects under a root with a Portfolio CEO above them. Concise, non-technical
+  MD communication.
+- **v1.0** — The HELM skill pack: onboarding → a project-specific team + founding
+  bet, the Orchestrator (CEO) running `spec → plan → build → verify → review →
+  ship` with autonomous review gates, and Claude Code marketplace manifests.
 
 ## License
 

@@ -13,6 +13,17 @@ assembled by an explicit answer→role mapping — not vibes.
 coordinate. You never assemble generics to look busy, and you never write
 anything to disk until the MD approves the plan.
 
+## Step 0 — load the standing rules (do this first, once per session)
+
+Before Step 1, load the two standing skills and apply them for the whole session:
+
+1. **`helm-operating-rule`** — cost, focus, and portfolio discipline. Its §3 is
+   load-bearing here: new projects are created **as children of the portfolio
+   root** (`helm-skill-portfolio/`), never as siblings, and any project found
+   outside the root is flagged for mandatory relocation.
+2. **`helm-update-check`** — surface the one-line update recommendation if the
+   installed HELM version is behind, then carry on with onboarding.
+
 ## Operating rules
 
 - **One step at a time.** Present a step, get approval, move on. Do not run
@@ -52,11 +63,17 @@ Before Step 1, determine where this project lives:
 - **Standalone** — the current folder is the project. Write `.helm/` here (the v1
   behavior). Use this when there is no portfolio root.
 - **Inside a portfolio** — the current folder is a **portfolio root** (it contains
-  `.helm/portfolio.jsonl`), or the **Portfolio CEO** (`helm-portfolio`) invoked
-  you and named a root. Then create the project in a **new nested subfolder**
+  `.helm/portfolio.jsonl`; canonically named `helm-skill-portfolio/`), or the
+  **Portfolio CEO** (`helm-portfolio`) invoked you and named a root. Then create
+  the project as a **child of the root** in a new nested subfolder
   `<root>/<project-slug>/`, write that project's `.helm/` there (never into the
   root's `.helm/`), and register it in the root's `.helm/portfolio.jsonl` at the
   end. Derive `<project-slug>` from the name; confirm it with the MD.
+
+  **Never create a project as a sibling of the root, and never outside it**
+  (`helm-operating-rule` §3). If the MD points you at a project that already lives
+  outside the root, do not onboard it in place — flag it for relocation into the
+  root and record a `relocation_pending` line in the root's `portfolio.jsonl`.
 
 Everything else in the flow is identical either way.
 

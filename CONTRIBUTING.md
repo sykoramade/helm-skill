@@ -18,6 +18,13 @@ If your change touches team selection (`skills/helm-onboarding/SKILL.md`) or the
 autonomous gate table (`skills/helm-orchestrator/SKILL.md`), the smoke test
 mirrors those tables and must be kept in lockstep.
 
+As of **v1.3** the smoke test also guards two packaging invariants (Case 4): the
+standing-rule skills `helm-operating-rule` and `helm-update-check` exist, all
+three entry points (`helm-orchestrator`, `helm-onboarding`, `helm-portfolio`)
+load them at startup, the canonical portfolio root name (`helm-skill-portfolio/`)
+is consistent, and `plugin.json` carries the bumped version. If you touch any of
+those, keep Case 4 green.
+
 ## Adding a new built role
 
 To add a live, auto-invoked specialist:
