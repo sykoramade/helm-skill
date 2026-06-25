@@ -29,7 +29,7 @@ Then run
 /plugin install helm@helm-skill
 ```
 
-Once install - type "onboard". That's it.
+Once installed - type "onboard" and follow the instructions.
 
 ## Start a project
 
@@ -94,12 +94,12 @@ domain and confirms it:
 
 Same engine, same gates. A project can be a paper or a business plan, not only code.
 
-## One CEO across many projects
+## One CEO across multiple projects
 
 Nest projects under a portfolio root, each with its own `.helm/`. The **Portfolio
 CEO** sits above them, reads each decision log, and tells you what needs you now —
 `NEEDS-MD`, `BLOCKED`, `STALE`, or `ON-TRACK` — in priority order, plus the
-cross-project risks no single project can see. You talk to one CEO; it holds it all.
+cross-project risks no single project can see. You talk to one point of contact to manage all your projects.
 
 ## Bring your own models (optional)
 
@@ -132,8 +132,7 @@ The skills are plain markdown — they work anywhere that reads instructions.
 ## Local-first, on purpose
 
 No server, no telemetry, no account. **Out of scope (until v2):** any learning
-corpus, central data collection, scoring/ranking, or a dashboard. Nothing to opt
-out of, nothing to trust us with.
+corpus, central data collection, ELO scoring/ranking across agents and skills, or a dashboard view.
 
 ## Troubleshooting
 
@@ -142,7 +141,6 @@ out of, nothing to trust us with.
 
 ## What's new
 
-A running list of what each release added. Newest first.
 
 - **v1.3** — **Operating rule** (`helm-operating-rule`): enforced defaults on cost
   (delegate grunt work, don't grind it inline), focus (every task traces to the
