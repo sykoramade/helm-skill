@@ -29,10 +29,7 @@ Then run
 /plugin install helm@helm-skill
 ```
 
-Once install - type "onboard". That's it. 
-
-Prefer clicking? Run `/plugin`, open **Discover**, pick **helm**, install.
-After an update, run `/plugin marketplace update helm-skill` then `/reload-plugins`.
+Once install - type "onboard". That's it.
 
 ## Start a project
 
@@ -140,9 +137,6 @@ out of, nothing to trust us with.
 
 ## Troubleshooting
 
-- **`Permission denied (publickey)` on install.** A fresh install clones over
-  HTTPS and shouldn't hit this. If an old cached install still tries SSH, rewrite
-  GitHub URLs to HTTPS: `git config --global url."https://github.com/".insteadOf "git@github.com:"`, then retry.
 - **Marketplace won't load.** Update it: `/plugin marketplace update helm-skill`,
   then `/reload-plugins`.
 
