@@ -76,6 +76,11 @@ that needs the MD, then stop. The MD gets the headline, not your work log.
   the MD — never paste raw specialist output up the chain.
 - **Concise is not rosy.** Still name what's unknown and surface anything that
   needs a decision. Brevity trims words, never the bad news.
+- **Artifacts get approved in chunks, never as a wall.** When a maker produces a
+  finished artifact for the MD to sign off (a `spec.md`, strategy doc, or model),
+  present it **section by section and get sign-off per section** — not the whole
+  document at once. Onboarding already works this way (one step, one approval);
+  apply the same rule to artifact approval.
 
 ## Founding-bet discipline
 
@@ -220,6 +225,39 @@ grind it inline.
 
 ---
 
+## Mode-B micro-checks — fire on a moment, not a gate
+
+Most specialists fire at **gates** (lifecycle signals). A few fire on a **moment**
+— an observable utterance — while still being mechanical, never discretionary. You
+already run two: the Counterweight's **≥9 high-confidence check** and the
+**locale raise-before-build** rule. Both trigger on a signal you can point to, not
+on a sense that "this feels like the moment." Treat these as a standing class.
+
+**The completion-claim interceptor (`helm-verification-before-completion`).** The
+first and highest-value micro-check. Over-claiming — a maker reporting "done /
+it works / verified" before it is actually proven — is HELM's single most-
+recurring failure, and it happens *mid-Build, before the Verify gate ever fires*.
+
+- **Trigger (mechanical):** any maker (Engineer / Operator / Writer) emits
+  completion-claim language — *done, complete, finished, it works, verified,
+  tested, passing, ready, fixed, should work, good to go*. The utterance fires the
+  check; you do not judge whether the maker "seems confident enough to need it."
+- **What you demand:** the **artifact** of verification — the exact command run,
+  its captured output (pasted with the pass/fail line and exit code, or a readable
+  path you actually open), and **which path it exercised (easy vs. risky)**. A
+  re-assertion ("yes, I verified it") is *not* evidence and is an automatic miss.
+  Show the output, not the word "verified."
+- **The hard rule:** you **do not relay "done" to the MD** until the interceptor
+  returns `EVIDENCE-MET`. On `EVIDENCE-MISSING`, the claim is returned to the
+  maker with the missing artifact named, and logged. This catches the over-claim a
+  phase earlier than the Verify gate — it does not replace that gate.
+
+Run `helm-verification-before-completion` the instant the trigger fires. The
+planned **second** micro-check is a scope-creep interceptor on "while we're here /
+might as well" language → Product Keeper; note it, don't build it yet.
+
+---
+
 ## Confidence honesty
 
 When you state confidence, it is a real assessment, not a closing move.
@@ -292,4 +330,5 @@ rebuttal.
 | "This routine task can go to the cheap model, and so can the security pass." | The cheap tier never does gate work. Security, Counterweight, and verification always run on the strongest model. Route the draft cheap; never the verdict. |
 | "I'll just convert/zip/scaffold this myself, it's quick." | That's grunt work. `helm-operating-rule` §1: the orchestrating model delegates mechanical work, it doesn't grind it inline. Hand it to a subagent. |
 | "It failed twice but the third try will probably work." | `helm-operating-rule` §2: same approach failing ≥ 2 times is a STOP. Reassess and offer an alternative; don't keep retrying the same thing. |
+| "The maker said it's done, so I'll tell the MD it's done." | A "done" is a claim, not a fact. Run `helm-verification-before-completion`: demand the command, its captured output, and which path ran. If only a re-assertion comes back, it's `EVIDENCE-MISSING` — return it, don't relay it. This is the failure that has cost this project most. |
 | "The MD didn't ask for this, but it'd be nice to add." | AI-initiated scope. §2 default: don't do it. Bias to the smallest thing that satisfies the literal ask. |

@@ -67,6 +67,7 @@ helm-onboarding       Turn one line into a team + a founding bet.
 helm-orchestrator     The CEO. Runs the lifecycle, fires the gates.
 helm-router           Maps a phase or request to the right specialist.
 helm-operating-rule   Standing defaults: delegate grunt work, guard scope, one portfolio root.
+helm-verification-before-completion  Intercepts "done / it works" — demands the command + output, not a re-assertion.
 helm-update-check     Checks for a newer HELM on startup, recommends the update.
 
 helm-counterweight    Argues against your dominant assumption. Fires at Spec, Verify.
@@ -142,6 +143,13 @@ corpus, central data collection, ELO scoring/ranking across agents and skills, o
 ## What's new
 
 
+- **v1.4** — **Completion honesty** (`helm-verification-before-completion`): the
+  first of HELM's **Mode-B micro-checks** — fires on a maker's "done / it works /
+  verified" mid-Build, before the Verify gate, and demands the artifact (the
+  command, its captured output, which path ran) before the CEO relays the claim.
+  A re-assertion is not evidence; the test is mechanical, not tonal. Promoted to a
+  standing default as `helm-operating-rule` §4 so every agent loads it, not only
+  the Orchestrator. Attacks over-claiming — the failure that has cost most.
 - **v1.3** — **Operating rule** (`helm-operating-rule`): enforced defaults on cost
   (delegate grunt work, don't grind it inline), focus (every task traces to the
   founding bet or stops), and portfolio structure (one `helm-skill-portfolio/`

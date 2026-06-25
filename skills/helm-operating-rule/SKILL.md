@@ -1,6 +1,6 @@
 ---
 name: helm-operating-rule
-description: HELM's standing operating rule — three enforced defaults on cost, focus, and portfolio discipline that apply to the Orchestrator and every agent for the whole session. Model routing (the orchestrating model never does grunt work), tangent & scope guards (every task traces to the founding bet or stops), and portfolio structure (one parent root, projects as children). Loaded first by the Orchestrator, Onboarding, and Portfolio CEO. Read it at the start of any HELM session.
+description: HELM's standing operating rule — four enforced defaults on cost, focus, portfolio discipline, and completion honesty that apply to the Orchestrator and every agent for the whole session. Model routing (the orchestrating model never does grunt work), tangent & scope guards (every task traces to the founding bet or stops), portfolio structure (one parent root, projects as children), and completion honesty (a "done" is not relayed without the artifact that proves it). Loaded first by the Orchestrator, Onboarding, and Portfolio CEO. Read it at the start of any HELM session.
 ---
 
 # HELM Operating Rule — Cost, Focus & Portfolio Discipline
@@ -11,11 +11,12 @@ description: HELM's standing operating rule — three enforced defaults on cost,
 > These are **enforced defaults, not suggestions.** When a rule says "STOP and
 > ask," surface a one-line check to the MD before spending more tokens.
 
-These three policies sharpen rules HELM already holds: the CEO never executes the
+These four policies sharpen rules HELM already holds: the CEO never executes the
 work (`helm-orchestrator`), every task traces to the founding bet
-(`helm-product-keeper`), and projects nest under a portfolio root
-(`helm-portfolio`). This skill makes the *cost*, *focus*, and *structure* edges of
-those rules mechanical and citable.
+(`helm-product-keeper`), projects nest under a portfolio root (`helm-portfolio`),
+and a completion claim is not a fact until its evidence is shown
+(`helm-verification-before-completion`). This skill makes the *cost*, *focus*,
+*structure*, and *completion-honesty* edges of those rules mechanical and citable.
 
 ---
 
@@ -115,6 +116,30 @@ helm-skill-portfolio/            ← the ONE parent folder
 ```json
 {"ts": "2026-06-25T10:00:00Z", "event": "relocation_pending", "project": "verita-factcheck", "found_at": "../helm-skill-test", "target": "helm-skill-portfolio/verita-factcheck", "note": "outside the portfolio root — relocate into the root"}
 ```
+
+---
+
+## 4. Completion Honesty — a "done" is not relayed without its evidence
+
+Every completion claim from a maker — *done, it works, verified, tested, passing,
+fixed, ready* — is intercepted **the moment it is uttered**, before the CEO relays
+it to the MD and before the Verify gate. This is HELM's most-recurring failure
+(over-claiming), and it happens mid-Build, a phase earlier than any gate.
+
+**The demand is mechanical: the artifact, not the assertion.** The maker must
+show the exact **command** run, its **captured output** (pasted with the pass/fail
+line and exit code, or a readable path the CEO opens), and **which path it
+exercised** (easy vs. risky). A re-assertion — "yes, I verified it" — is *not*
+evidence; it is an automatic miss. *Show the output, not the word "verified."*
+
+**Hard rule:** the CEO does **not** relay "done" upward until the evidence is
+present and seen. No artifact → the claim is returned to the maker with the
+missing piece named, and logged to `.helm/decisions.jsonl`. The full mechanics
+live in `helm-verification-before-completion` — the **first of HELM's Mode-B
+micro-checks** (triggered by an utterance, not a gate). The planned **second** is
+a scope-creep check on "while we're here / might as well" language → Product
+Keeper. This rule says "intercept the claim"; the skill says "and here is exactly
+what to demand."
 
 ---
 
