@@ -19,17 +19,20 @@ to `.helm/decisions.jsonl` in your own repo — yours, auditable, and nowhere el
 ---
 
 ## Install (Claude Code)
-
+Due to SSH issues with CC, input this to cache keys
+```text
+ssh -o StrictHostKeyChecking=accept-new -T git@github.com
+```
+Then run
 ```text
 /plugin marketplace add sykoramade/helm-skill
 /plugin install helm@helm-skill
 ```
 
-That's it. Prefer clicking? Run `/plugin`, open **Discover**, pick **helm**, install.
-After an update, run `/plugin marketplace update helm-skill` then `/reload-plugins`.
+Once install - type "onboard". That's it. 
 
-> Needs a recent Claude Code (`claude --version` ≥ 2.1.143). The fetch is over
-> HTTPS — no SSH keys required.
+Prefer clicking? Run `/plugin`, open **Discover**, pick **helm**, install.
+After an update, run `/plugin marketplace update helm-skill` then `/reload-plugins`.
 
 ## Start a project
 
